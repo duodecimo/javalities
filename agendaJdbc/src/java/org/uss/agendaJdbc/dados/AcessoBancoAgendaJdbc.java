@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 public class AcessoBancoAgendaJdbc {
     private Connection connection;
     private Statement statement;
+    private boolean verificarBanco;
     private boolean verificarTabelaPessoa;
     private boolean verificarTabelaTipo;
     private boolean verificarTabelaTelefone;
@@ -42,6 +43,26 @@ public class AcessoBancoAgendaJdbc {
         }
     }
 
+    private void verificarBanco() {
+        if(!verificarBanco) {
+            try {
+                String cmd = "CREATE SCHEMA agendaJdbc";
+                comandar();
+                statement.execute(cmd);
+            } catch (SQLException ex) {
+                Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            try {
+                String cmd = "SET SCHEMA agendaJdbc";
+                comandar();
+                statement.execute(cmd);
+            } catch (SQLException ex) {
+                Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            verificarBanco = true;
+        }
+    }
+
     private void verificarTabelas() {
         verificarTabelaPessoa();
         verificarTabelaTipo();
@@ -51,11 +72,12 @@ public class AcessoBancoAgendaJdbc {
     private void verificarTabelaPessoa() {
         if (!verificarTabelaPessoa) {
             // tabela pessoa ainda não foi verificada nesta sessão
+            verificarBanco();
             try {
                 String cmd = "CREATE TABLE pessoa("
                         + "id INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT pessoaPK PRIMARY KEY, "
                         + "nome VARCHAR(255) CONSTRAINT pessoaNomeUnique UNIQUE, "
-                        + "email VARCHAR(255) ON DELETE CASCADE ON UPDATE RESTRICT"
+                        + "email VARCHAR(255)"
                         + ")";
                 comandar();
                 statement.execute(cmd);
@@ -70,11 +92,11 @@ public class AcessoBancoAgendaJdbc {
     private void verificarTabelaTipo() {
         if (!verificarTabelaTipo) {
             // tabela tipo ainda não foi verificada nesta sessão
+            verificarBanco();
             try {
                 String cmd = "CREATE TABLE tipo("
                         + "id INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT tipoPK PRIMARY KEY, "
                         + "nome VARCHAR(255) CONSTRAINT tipoNomeUnique UNIQUE "
-                        + "ON DELETE CASCADE ON UPDATE RESTRICT"
                         + ")";
                 comandar();
                 statement.execute(cmd);
@@ -89,6 +111,7 @@ public class AcessoBancoAgendaJdbc {
     private void verificarTabelaTelefone() {
         if (!verificarTabelaTelefone) {
             // tabela telefone ainda não foi verificada nesta sessão
+            verificarBanco();
             try {
                 String cmd = "CREATE TABLE telefone("
                         + "id INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT telefonePK PRIMARY KEY, "
