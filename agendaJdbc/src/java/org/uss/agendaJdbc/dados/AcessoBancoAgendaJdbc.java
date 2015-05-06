@@ -127,7 +127,7 @@ public class AcessoBancoAgendaJdbc {
             try {
                 String cmd = "ALTER TABLE telefone "
                         + "ADD CONSTRAINT telefoneTipoFK "
-                        + "FOREIGN KEY (tipo) REFERENCES tipo (id)";
+                        + "FOREIGN KEY (tipo) REFERENCES tipo (id) ON DELETE CASCADE ON UPDATE RESTRICT";
                 comandar();
                 statement.execute(cmd);
             } catch (SQLException ex) {
@@ -136,7 +136,7 @@ public class AcessoBancoAgendaJdbc {
             try {
                 String cmd = "ALTER TABLE telefone "
                         + "ADD CONSTRAINT telefonePessoaFK "
-                        + "FOREIGN KEY (pessoa) REFERENCES pessoa (id)";
+                        + "FOREIGN KEY (pessoa) REFERENCES pessoa (id) ON DELETE CASCADE ON UPDATE RESTRICT";
                 comandar();
                 statement.execute(cmd);
             } catch (SQLException ex) {
