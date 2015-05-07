@@ -5,6 +5,7 @@
  */
 package org.uss.agendaJdbc.dados;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -42,6 +43,9 @@ public class Pessoa {
     }
 
     public List<Telefone> getTelefones() {
+        if(telefones == null) {
+            telefones = new ArrayList<>();
+        }
         return telefones;
     }
 

@@ -20,26 +20,43 @@ import java.util.logging.Logger;
  * @author duo
  */
 public class AcessoBancoAgendaJdbc {
-    private Connection connection;
-    private Statement statement;
+    private Connection connection1;
+    private Connection connection2;
+    private Statement statement1;
+    private Statement statement2;
     private boolean verificarBanco;
     private boolean verificarTabelaPessoa;
     private boolean verificarTabelaTipo;
     private boolean verificarTabelaTelefone;
     
     private void conectar() throws SQLException {
-        if(connection == null) {
-            connection = 
+        if(connection1 == null) {
+            connection1 = 
                     DriverManager.
                             getConnection("jdbc:derby://localhost:1527/agendaJdbc;create=true", 
                                     "agendaJdbc", "agendaJdbc");
+            if(!connection1.getAutoCommit()) {
+                connection1.setAutoCommit(true);
+            }
+        }
+        if(connection2 == null) {
+            connection2 = 
+                    DriverManager.
+                            getConnection("jdbc:derby://localhost:1527/agendaJdbc;create=true", 
+                                    "agendaJdbc", "agendaJdbc");
+            if(!connection2.getAutoCommit()) {
+                connection2.setAutoCommit(true);
+            }
         }
     }
 
     private void comandar() throws SQLException {
         conectar();
-        if(statement == null) {
-            statement = connection.createStatement();
+        if(statement1 == null) {
+            statement1 = connection1.createStatement();
+        }
+        if(statement2 == null) {
+            statement2 = connection2.createStatement();
         }
     }
 
@@ -48,14 +65,14 @@ public class AcessoBancoAgendaJdbc {
             try {
                 String cmd = "CREATE SCHEMA agendaJdbc";
                 comandar();
-                statement.execute(cmd);
+                statement1.execute(cmd);
             } catch (SQLException ex) {
                 Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).log(Level.SEVERE, null, ex);
             }
             try {
                 String cmd = "SET SCHEMA agendaJdbc";
                 comandar();
-                statement.execute(cmd);
+                statement1.execute(cmd);
             } catch (SQLException ex) {
                 Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -80,7 +97,7 @@ public class AcessoBancoAgendaJdbc {
                         + "email VARCHAR(255)"
                         + ")";
                 comandar();
-                statement.execute(cmd);
+                statement1.execute(cmd);
                 // nesta sessão não é mais nescessaŕio verificar a tabela pessoa
                 verificarTabelaPessoa = true;
             } catch (SQLException ex) {
@@ -99,7 +116,7 @@ public class AcessoBancoAgendaJdbc {
                         + "nome VARCHAR(255) CONSTRAINT tipoNomeUnique UNIQUE "
                         + ")";
                 comandar();
-                statement.execute(cmd);
+                statement1.execute(cmd);
             } catch (SQLException ex) {
                 Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -120,7 +137,7 @@ public class AcessoBancoAgendaJdbc {
                         + "pessoa INT"
                         + ")";
                 comandar();
-                statement.execute(cmd);
+                statement1.execute(cmd);
             } catch (SQLException ex) {
                 Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -129,7 +146,7 @@ public class AcessoBancoAgendaJdbc {
                         + "ADD CONSTRAINT telefoneTipoFK "
                         + "FOREIGN KEY (tipo) REFERENCES tipo (id) ON DELETE CASCADE ON UPDATE RESTRICT";
                 comandar();
-                statement.execute(cmd);
+                statement1.execute(cmd);
             } catch (SQLException ex) {
                 Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -138,7 +155,7 @@ public class AcessoBancoAgendaJdbc {
                         + "ADD CONSTRAINT telefonePessoaFK "
                         + "FOREIGN KEY (pessoa) REFERENCES pessoa (id) ON DELETE CASCADE ON UPDATE RESTRICT";
                 comandar();
-                statement.execute(cmd);
+                statement1.execute(cmd);
             } catch (SQLException ex) {
                 Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -151,14 +168,20 @@ public class AcessoBancoAgendaJdbc {
         Pessoa pessoa;
         String cmd = "SELECT id, nome, email FROM pessoa ORDER BY nome";
         verificarTabelaPessoa();
-        ResultSet resultSet = statement.executeQuery(cmd);
-        List<Pessoa> pessoas = new ArrayList<>();
-        while(resultSet.next()) {
-            pessoa = new Pessoa();
-            pessoa.setId(resultSet.getInt("id"));
-            pessoa.setNome(resultSet.getString("nome"));
-            pessoa.setEmail(resultSet.getString("email"));
-            pessoas.add(pessoa);
+        List<Pessoa> pessoas;
+        try (ResultSet resultSet = statement1.executeQuery(cmd)) {
+            pessoas = new ArrayList<>();
+            while(resultSet.next()) {
+                pessoa = new Pessoa();
+                pessoa.setId(resultSet.getInt("id"));
+                pessoa.setNome(resultSet.getString("nome"));
+                pessoa.setEmail(resultSet.getString("email"));
+                pessoas.add(pessoa);
+            }
+        }
+        // recuperar os telefones de cada pessoa
+        for(Pessoa p : pessoas) {
+            p.setTelefones(getTelefones(p.getId()));
         }
         return pessoas;
     }
@@ -167,7 +190,7 @@ public class AcessoBancoAgendaJdbc {
         Pessoa pessoa = null;
         String cmd = "SELECT id, nome, email FROM pessoa WHERE id = " + pessoaId;
         verificarTabelaPessoa();
-        ResultSet resultSet = statement.executeQuery(cmd);
+        ResultSet resultSet = statement1.executeQuery(cmd);
         while(resultSet.next()) {
             pessoa = new Pessoa();
             pessoa.setId(resultSet.getInt("id"));
@@ -184,7 +207,7 @@ public class AcessoBancoAgendaJdbc {
         Tipo tipo;
         String cmd = "SELECT id, nome FROM tipo ORDER BY nome";
         verificarTabelaTipo();
-        ResultSet resultSet = statement.executeQuery(cmd);
+        ResultSet resultSet = statement1.executeQuery(cmd);
         List<Tipo> tipos = new ArrayList<>();
         while(resultSet.next()) {
             tipo = new Tipo();
@@ -199,7 +222,7 @@ public class AcessoBancoAgendaJdbc {
         Tipo tipo = null;
         String cmd = "SELECT id, nome FROM tipo WHERE id = " + tipoId;
         verificarTabelaTipo();
-        ResultSet resultSet = statement.executeQuery(cmd);
+        ResultSet resultSet = statement1.executeQuery(cmd);
         while(resultSet.next()) {
             tipo = new Tipo();
             tipo.setId(resultSet.getInt("id"));
@@ -220,41 +243,32 @@ public class AcessoBancoAgendaJdbc {
         Telefone telefone;
         String cmd = "SELECT id, numero, tipo, pessoa FROM telefone WHERE pessoa = " + pessoaId;
         verificarTabelas();
-        ResultSet resultSet = statement.executeQuery(cmd);
         List<Telefone> telefones = new ArrayList<>();
-        while(resultSet.next()) {
-            telefone = new Telefone();
-            telefone.setId(resultSet.getInt("id"));
-            telefone.setNumero(resultSet.getString("numero"));
-            telefone.setTipo(getTipo(resultSet.getInt("tipo")));
-            telefone.setPessoa(getPessoa(resultSet.getInt("pessoa")));
-            telefones.add(telefone);
+        try (ResultSet resultSet = statement2.executeQuery(cmd)) {
+            while(resultSet.next()) {
+                telefone = new Telefone();
+                telefone.setId(resultSet.getInt("id"));
+                telefone.setNumero(resultSet.getString("numero"));
+                telefone.setTipo(getTipo(resultSet.getInt("tipo")));
+                telefone.setPessoa(getPessoa(resultSet.getInt("pessoa")));
+                telefones.add(telefone);
+            }
         }
         return telefones;
     }
 
     public void criarPessoa(Pessoa pessoa) throws SQLException {
         verificarTabelaPessoa();
-        // criar pessoa pode envolver
-        // mais de uma operação:
-        // se houverem telefones na lista
-        // de telefones do objeto pessoa,
-        // os telefones precisam ser criados.
-        // as operações portanto devem ser
-        // executadas dentro de uma transação
-        connection.setAutoCommit(false);
         String cmd = "INSERT INTO pessoa values("
                 + "default, "
                 + "'" + pessoa.getNome() + "'" + ", "
                 + "'" + pessoa.getEmail() + "'" + ")";
-        statement.execute(cmd);
+        statement1.execute(cmd);
         // incluir telefones presentes no objeto
 
         for (Telefone telefone : pessoa.getTelefones()) {
             criarTelefone(telefone);
         }
-        connection.commit();
-        connection.setAutoCommit(true);
     }
 
     public void criarTipo(Tipo tipo) throws SQLException {
@@ -262,7 +276,7 @@ public class AcessoBancoAgendaJdbc {
         String cmd = "INSERT INTO tipo values("
                 + "default, "
                 + "'" + tipo.getNome() + "'" +  ")";
-        statement.execute(cmd);
+        statement1.execute(cmd);
     }
 
     /**
@@ -278,38 +292,28 @@ public class AcessoBancoAgendaJdbc {
                 + "'" + telefone.getNumero()+ "'" + ", "
                 + "" + telefone.getTipo().getId()+ ", " 
                 + "" + telefone.getPessoa().getId()+ "" + ")";
-        statement.execute(cmd);
+        statement2.execute(cmd);
     }
 
     public void alterarPessoa(Pessoa pessoa) throws SQLException {
         verificarTabelaPessoa();
-        // alterar pessoa pode envolver
-        // mais de uma operação:
-        // se houverem telefones na lista
-        // de telefones do objeto pessoa,
-        // os telefones precisam ser criados.
-        // as operações portanto devem ser
-        // executadas dentro de uma transação
-        connection.setAutoCommit(false);
         String cmd = "UPDATE pessoa "
                 + "SET nome = "
                 + "'" + pessoa.getNome() + "'" + ", "
                 + "email = "
-                + "'" + pessoa.getEmail()+ "' "
+                + "'" + pessoa.getEmail() + "' "
                 + "WHERE id = " + pessoa.getId();
-        statement.execute(cmd);
+        statement1.execute(cmd);
         // ao alterar uma pessoa, e preciso verificar
         // a lista de telefones da pessoa, podem ter
         // havido inclusoes e alterações.
-        for(Telefone telefone : pessoa.getTelefones()) {
-            if(telefone.getId() > 0) { // telefone ja existe
+        for (Telefone telefone : pessoa.getTelefones()) {
+            if (telefone.getId() > 0) { // telefone ja existe
                 alterarTelefone(telefone);
             } else {
                 criarTelefone(telefone);
             }
         }
-        connection.commit();
-        connection.setAutoCommit(true);
     }
 
     public void alterarTipo(Tipo tipo) throws SQLException {
@@ -318,7 +322,7 @@ public class AcessoBancoAgendaJdbc {
                 + "SET nome = "
                 + "'" + tipo.getNome() + "'" + ", "
                 + "WHERE id = " + tipo.getId();
-        statement.execute(cmd);
+        statement1.execute(cmd);
     }
 
     /**
@@ -338,7 +342,7 @@ public class AcessoBancoAgendaJdbc {
                 + "pessoa = "
                 + "" + telefone.getPessoa().getId()+ " "
                 + "WHERE id = " + telefone.getId();
-        statement.execute(cmd);
+        statement2.execute(cmd);
     }
 
     public boolean isVerificarTabelaPessoa() {
