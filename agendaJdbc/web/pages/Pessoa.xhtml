@@ -51,6 +51,21 @@
                                         <h:outputLabel value="Email"/>
                                         <h:inputText value="#{pessoaBean.pessoa.email}"/>
                                     </h:panelGrid>
+                                    <h:dataTable value="#{pessoaBean.pessoa.telefones}" var="item" border="1">
+                                        <h:column>
+                                            <f:facet name="header">
+                                                Numero
+                                            </f:facet>
+                                            <h:outputText value="#{item.numero}"/>
+                                        </h:column>
+                                        <h:column>
+                                            <f:facet name="header">
+                                                Tipo
+                                            </f:facet>
+                                            <h:outputText value="#{item.tipo}"/>
+                                        </h:column>
+                                    </h:dataTable>
+                                    <p/>
                                     <h:commandButton value="Salvar" action="#{pessoaBean.salvar()}"/>
                                     <h:commandButton value="Abandonar" action="#{pessoaBean.abandonar()}"/>
                                 </h:form>
