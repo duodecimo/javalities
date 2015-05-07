@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <body>
+
+        <ui:composition template="./../template/agendaJdbcTemplate.xhtml">
+
+            <ui:define name="top">
+                <center>
+                    <h1>Agenda</h1>
+                    <h3>Tipo</h3>
+                </center>
+            </ui:define>
+
+            <ui:define name="content">
+                <center>
+                    <f:view>
+                        <h:form>
+                            <h:panelGroup rendered="#{tipoBean.recuperando}">
+                                <h:form>
+                                    <h:dataTable value="#{tipoBean.tipos}" var="item" border="1">
+                                        <h:column>
+                                            <f:facet name="header">
+                                                Nome
+                                            </f:facet>
+                                            <h:outputText value="#{item.nome}"/>
+                                        </h:column>
+                                        <h:column>
+                                            <h:commandButton value="Alterar" action="#{tipoBean.alterar(item)}"/>
+                                        </h:column>
+                                    </h:dataTable>
+                                    <h:commandButton value="Novo Tipo" action="#{tipoBean.criar()}"/>
+                                </h:form>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{tipoBean.criando || tipoBean.alterando}">
+                                <h:form>
+
+                                    <h:panelGrid columns="2">
+                                        <h:outputLabel value="Nome"/>
+                                        <h:inputText value="#{tipoBean.tipo.nome}"/>
+                                    </h:panelGrid>
+                                    <h:commandButton value="Salvar" action="#{tipoBean.salvar()}"/>
+                                    <h:commandButton value="Abandonar" action="#{tipoBean.abandonar()}"/>
+                                </h:form>
+                            </h:panelGroup>
+                        </h:form>
+                    </f:view>
+                </center>
+            </ui:define>
+
+        </ui:composition>
+
+    </body>
+</html>
