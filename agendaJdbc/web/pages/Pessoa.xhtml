@@ -65,9 +65,25 @@
                                             <h:outputText value="#{item.tipo}"/>
                                         </h:column>
                                     </h:dataTable>
+                                    <h:commandButton value="Adicionar telefone" action="#{pessoaBean.adicionarTelefone()}"/>
                                     <p/>
                                     <h:commandButton value="Salvar" action="#{pessoaBean.salvar()}"/>
                                     <h:commandButton value="Abandonar" action="#{pessoaBean.abandonar()}"/>
+                                </h:form>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{pessoaBean.editarTelefone}">
+                                <h:form>
+                                    <h:panelGrid columns="2">
+                                        <h:outputLabel value="Numero"/>
+                                        <h:inputText value="#{pessoaBean.telefone.numero}"/>
+                                        <h:outputLabel value="Tipo"/>
+                                        <h:selectOneMenu value="#{pessoaBean.telefone.tipo}">
+                                            <f:selectItems value="#{pessoaBean.tipos}"/>
+                                            <f:converter converterId="org.uss.agendaJdbc.converters.TipoConverter"/>
+                                        </h:selectOneMenu>
+                                    </h:panelGrid>
+                                    <h:commandButton value="Adicionar" action="#{pessoaBean.confirmaAdicionarTelefone()}"/>
+                                    <h:commandButton value="Abandonar" action="#{pessoaBean.abandonaTelefone()}"/>
                                 </h:form>
                             </h:panelGroup>
                         </h:form>

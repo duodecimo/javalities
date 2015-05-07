@@ -16,6 +16,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import org.uss.agendaJdbc.dados.AcessoBancoAgendaJdbc;
 import org.uss.agendaJdbc.dados.Pessoa;
+import org.uss.agendaJdbc.dados.Telefone;
+import org.uss.agendaJdbc.dados.Tipo;
 
 /**
  *
@@ -26,9 +28,11 @@ import org.uss.agendaJdbc.dados.Pessoa;
 public class PessoaBean implements Serializable {
     private @Inject Conversation conversation;
     private Pessoa pessoa;
+    private Telefone telefone;
     private AcessoBancoAgendaJdbc acessoBanco;
-    enum Estado {RECUPERANDO, CRIANDO, ALTERANDO, REMOVENDO};
+    enum Estado {RECUPERANDO, CRIANDO, ALTERANDO, REMOVENDO, EDITARTELEFONE};
     private Estado estado = Estado.RECUPERANDO;
+    private Estado estadoPrevio;
 
     public Pessoa getPessoa() {
         return pessoa;
@@ -37,7 +41,14 @@ public class PessoaBean implements Serializable {
     public void setPessoa(Pessoa pessoa) {
         this.pessoa = pessoa;
     }
-    
+
+    public Telefone getTelefone() {
+        return telefone;
+    }
+
+    public void setTelefone(Telefone telefone) {
+        this.telefone = telefone;
+    }
 
     public List<Pessoa> getPessoas() {
         if(acessoBanco == null) {
@@ -45,6 +56,19 @@ public class PessoaBean implements Serializable {
         }
         try {
             return acessoBanco.getPessoas();
+        } catch (SQLException ex) {
+            System.out.println("Erro obtendo lista: " + ex);
+            Logger.getLogger(PessoaBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
+    public List<Tipo> getTipos() {
+        if(acessoBanco == null) {
+            acessoBanco = new AcessoBancoAgendaJdbc();
+        }
+        try {
+            return acessoBanco.getTipos();
         } catch (SQLException ex) {
             System.out.println("Erro obtendo lista: " + ex);
             Logger.getLogger(PessoaBean.class.getName()).log(Level.SEVERE, null, ex);
@@ -67,6 +91,24 @@ public class PessoaBean implements Serializable {
             conversation.begin();
         }
         estado = Estado.ALTERANDO;
+        return null;
+    }
+
+    public String adicionarTelefone() {
+        telefone = new Telefone();
+        telefone.setPessoa(pessoa);
+        estadoPrevio = estado;
+        estado = Estado.EDITARTELEFONE;
+        return null;
+    }
+
+    public String confirmaAdicionarTelefone() {
+        pessoa.getTelefones().add(telefone);
+        return abandonaTelefone();
+    }
+
+    public String abandonaTelefone() {
+        estado = estadoPrevio;
         return null;
     }
 
@@ -109,5 +151,9 @@ public class PessoaBean implements Serializable {
 
     public boolean isRemovendo() {
         return estado == Estado.REMOVENDO;
+    }
+
+    public boolean isEditarTelefone() {
+        return estado == Estado.EDITARTELEFONE;
     }
 }

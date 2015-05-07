@@ -231,6 +231,19 @@ public class AcessoBancoAgendaJdbc {
         return tipo;
     }
 
+    public Tipo getTipo(String tipoNome) throws SQLException {
+        Tipo tipo = null;
+        String cmd = "SELECT id, nome FROM tipo WHERE nome = " + tipoNome.trim();
+        verificarTabelaTipo();
+        ResultSet resultSet = statement1.executeQuery(cmd);
+        while(resultSet.next()) {
+            tipo = new Tipo();
+            tipo.setId(resultSet.getInt("id"));
+            tipo.setNome(resultSet.getString("nome"));
+        }
+        return tipo;
+    }
+
     /**
      * O método não é público: é utilizado internamente
      * pelos métodos de atualização de pessoa
