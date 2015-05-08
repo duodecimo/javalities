@@ -167,8 +167,10 @@ public class AcessoBancoAgendaJdbc {
                 + "'" + pessoa.getEmail() + "'" + ")";
         comandar();
         statement1.execute(cmd);
-        // incluir telefones presentes no objeto
-
+        // incluir telefones eventualmente presentes
+        // na lista de telefones do objeto pessoa.
+        // observe que como e um novo objeto pessoa,
+        // só podem haver telefones para incluir
         for (Telefone telefone : pessoa.getTelefones()) {
             criarTelefone(telefone);
         }
@@ -211,9 +213,9 @@ public class AcessoBancoAgendaJdbc {
         // ao alterar uma pessoa, e preciso verificar
         // a lista de telefones da pessoa, podem ter
         // havido inclusoes e alterações.
-        System.out.println("===>>>> Alterando pessoa: atualizando telefones!");
+        //System.out.println("===>>>> Alterando pessoa: atualizando telefones!");
         for (Telefone telefone : pessoa.getTelefones()) {
-            System.out.println("===>>>>    Iterando telefone " + telefone.getNumero());
+            //System.out.println("===>>>>    Iterando telefone " + telefone.getNumero());
             if (telefone.getId() != null && telefone.getId() > 0) { // telefone ja existe
                 alterarTelefone(telefone);
             } else {

@@ -64,6 +64,9 @@
                                             </f:facet>
                                             <h:outputText value="#{item.tipo}"/>
                                         </h:column>
+                                        <h:column>
+                                            <h:commandButton value="Alterar" action="#{pessoaBean.alterarTelefone(item)}"/>
+                                        </h:column>
                                     </h:dataTable>
                                     <h:commandButton value="Adicionar telefone" action="#{pessoaBean.adicionarTelefone()}"/>
                                     <p/>
@@ -71,7 +74,7 @@
                                     <h:commandButton value="Abandonar" action="#{pessoaBean.abandonar()}"/>
                                 </h:form>
                             </h:panelGroup>
-                            <h:panelGroup rendered="#{pessoaBean.editarTelefone}">
+                            <h:panelGroup rendered="#{pessoaBean.criandoTelefone || pessoaBean.alterandoTelefone}">
                                 <h:form>
                                     <h:panelGrid columns="2">
                                         <h:outputLabel value="Numero"/>
@@ -81,8 +84,15 @@
                                             <f:selectItems value="#{pessoaBean.tipos}"/>
                                         </h:selectOneMenu>
                                     </h:panelGrid>
-                                    <h:commandButton value="Adicionar" action="#{pessoaBean.confirmaAdicionarTelefone()}"/>
-                                    <h:commandButton value="Abandonar" action="#{pessoaBean.abandonaTelefone()}"/>
+                                    <h:commandButton value="Adicionar" 
+                                                     rendered="#{pessoaBean.criandoTelefone}"
+                                                     action="#{pessoaBean.confirmaAdicionarTelefone()}"/>
+                                    <h:commandButton value="Abandonar" 
+                                                     rendered="#{pessoaBean.criandoTelefone}"
+                                                     action="#{pessoaBean.abandonaTelefone()}"/>
+                                    <h:commandButton value="Retornar" 
+                                                     rendered="#{pessoaBean.alterandoTelefone}"
+                                                     action="#{pessoaBean.confirmaAlterarTelefone()}"/>
                                 </h:form>
                             </h:panelGroup>
                         </h:form>

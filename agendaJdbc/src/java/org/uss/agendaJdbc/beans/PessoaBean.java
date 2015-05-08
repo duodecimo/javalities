@@ -32,7 +32,8 @@ public class PessoaBean implements Serializable {
     private Pessoa pessoa;
     private Telefone telefone;
     private AcessoBancoAgendaJdbc acessoBanco;
-    enum Estado {RECUPERANDO, CRIANDO, ALTERANDO, REMOVENDO, EDITARTELEFONE};
+    enum Estado {RECUPERANDO, CRIANDO, ALTERANDO, REMOVENDO, 
+    CRIARTELEFONE, ALTERARTELEFONE};
     private Estado estado = Estado.RECUPERANDO;
     private Estado estadoPrevio;
     private List<Tipo> tipos;
@@ -104,7 +105,16 @@ public class PessoaBean implements Serializable {
         telefone = new Telefone();
         telefone.setPessoa(pessoa);
         estadoPrevio = estado;
-        estado = Estado.EDITARTELEFONE;
+        estado = Estado.CRIARTELEFONE;
+        if(conversation.isTransient()) {
+            conversation.begin();
+        }
+        return null;
+    }
+    public String alterarTelefone(Telefone telefoneSelecionado) {
+        telefone = telefoneSelecionado;
+        estadoPrevio = estado;
+        estado = Estado.ALTERARTELEFONE;
         if(conversation.isTransient()) {
             conversation.begin();
         }
@@ -116,9 +126,16 @@ public class PessoaBean implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, 
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso: ", 
                         "Telefone adicionado. Alteração só terá efeito após salvar pessoa."));
-        System.out.println("===>>>> Adicionado telefone " + telefone.getNumero() + 
-                " a pessoa " + pessoa.getNome() +
-                " voltando para estado " + estadoPrevio);
+        //System.out.println("===>>>> Adicionado telefone " + telefone.getNumero() + 
+        //        " a pessoa " + pessoa.getNome() +
+        //        " voltando para estado " + estadoPrevio);
+        return abandonaTelefone();
+    }
+
+    public String confirmaAlterarTelefone() {
+        FacesContext.getCurrentInstance().addMessage(null, 
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso: ", 
+                        "Telefone alterado. Alteração só terá efeito após salvar pessoa."));
         return abandonaTelefone();
     }
 
@@ -178,7 +195,11 @@ public class PessoaBean implements Serializable {
         return estado == Estado.REMOVENDO;
     }
 
-    public boolean isEditarTelefone() {
-        return estado == Estado.EDITARTELEFONE;
+    public boolean isCriandoTelefone() {
+        return estado == Estado.CRIARTELEFONE;
+    }
+
+    public boolean isAlterandoTelefone() {
+        return estado == Estado.ALTERARTELEFONE;
     }
 }
