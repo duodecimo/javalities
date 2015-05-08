@@ -12,6 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.uss.agendaJdbc.dados.AcessoBancoAgendaJdbc;
@@ -33,6 +35,7 @@ public class PessoaBean implements Serializable {
     enum Estado {RECUPERANDO, CRIANDO, ALTERANDO, REMOVENDO, EDITARTELEFONE};
     private Estado estado = Estado.RECUPERANDO;
     private Estado estadoPrevio;
+    private List<Tipo> tipos;
 
     public Pessoa getPessoa() {
         return pessoa;
@@ -64,16 +67,18 @@ public class PessoaBean implements Serializable {
     }
 
     public List<Tipo> getTipos() {
-        if(acessoBanco == null) {
-            acessoBanco = new AcessoBancoAgendaJdbc();
+        if (tipos==null) {
+            if (acessoBanco == null) {
+                acessoBanco = new AcessoBancoAgendaJdbc();
+            }
+            try {
+                tipos = acessoBanco.getTipos();
+            } catch (SQLException ex) {
+                System.out.println("Erro obtendo lista: " + ex);
+                Logger.getLogger(PessoaBean.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
-        try {
-            return acessoBanco.getTipos();
-        } catch (SQLException ex) {
-            System.out.println("Erro obtendo lista: " + ex);
-            Logger.getLogger(PessoaBean.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
+        return tipos;
     }
 
     public String criar() {
@@ -91,6 +96,7 @@ public class PessoaBean implements Serializable {
             conversation.begin();
         }
         estado = Estado.ALTERANDO;
+        System.out.println("===>>> Alterando pessoa " + pessoa.getNome());
         return null;
     }
 
@@ -99,27 +105,45 @@ public class PessoaBean implements Serializable {
         telefone.setPessoa(pessoa);
         estadoPrevio = estado;
         estado = Estado.EDITARTELEFONE;
+        if(conversation.isTransient()) {
+            conversation.begin();
+        }
         return null;
     }
 
     public String confirmaAdicionarTelefone() {
         pessoa.getTelefones().add(telefone);
+        FacesContext.getCurrentInstance().addMessage(null, 
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso: ", 
+                        "Telefone adicionado. Alteração só terá efeito após salvar pessoa."));
+        System.out.println("===>>>> Adicionado telefone " + telefone.getNumero() + 
+                " a pessoa " + pessoa.getNome() +
+                " voltando para estado " + estadoPrevio);
         return abandonaTelefone();
     }
 
     public String abandonaTelefone() {
+        if(!conversation.isTransient()) {
+            conversation.end();
+        }
         estado = estadoPrevio;
+        if(conversation.isTransient()) {
+            conversation.begin();
+        }
         return null;
     }
 
     public String salvar() {
+        System.out.println("===>>> salvando Alteração/Criação");
         if(acessoBanco == null) {
             acessoBanco = new AcessoBancoAgendaJdbc();
         }
         try {
             if (isCriando()) {
+                System.out.println("===>>> salvando a pessoa " + pessoa.getNome());
                 acessoBanco.criarPessoa(pessoa);
             } else if(isAlterando()) {
+                System.out.println("===>>> salvando Alteração da pessoa " + pessoa.getNome());
                 acessoBanco.alterarPessoa(pessoa);
             }
         } catch (SQLException ex) {
@@ -130,6 +154,7 @@ public class PessoaBean implements Serializable {
     }
 
     public String abandonar() {
+        System.out.println("===>>> abandonando Alteração/Criação");
         if(!conversation.isTransient()) {
             conversation.end();
         }

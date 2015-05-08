@@ -5,6 +5,8 @@
  */
 package org.uss.agendaJdbc.dados;
 
+import java.util.Objects;
+
 /**
  *
  * @author user
@@ -33,4 +35,22 @@ public class Tipo {
     public String toString() {
         return nome;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        Tipo tipo = (Tipo) obj;
+        //System.out.println("=====>>>> Comparando tipo! " + this.getNome() + " == " + tipo.getNome() + " ?");
+        int i = this.getNome().compareTo(tipo.getNome());
+        return i==0;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 31 * hash + Objects.hashCode(this.id);
+        hash = 31 * hash + Objects.hashCode(this.nome);
+        return hash;
+    }
+
+    
 }

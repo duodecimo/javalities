@@ -5,7 +5,6 @@
  */
 package org.uss.agendaJdbc.converters;
 
-import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.component.UIComponent;
@@ -19,7 +18,7 @@ import org.uss.agendaJdbc.dados.Tipo;
  *
  * @author duo
  */
-@FacesConverter("org.uss.agendaJdbc.converters.TipoConverter")
+@FacesConverter(forClass = Tipo.class, value = "TipoConverter")
 public class TipoConverter implements Converter {
     AcessoBancoAgendaJdbc acessoBanco;
 
@@ -28,19 +27,29 @@ public class TipoConverter implements Converter {
         if (acessoBanco == null) {
             acessoBanco = new AcessoBancoAgendaJdbc();
         }
-        Integer tipo = new Integer(value);
+        Tipo tipo = null;
+        Integer tipoId = new Integer(value);
+        //System.out.println("==>>> Sera feita tentativa de converter " + value + " para objeto da classe Tipo!!!");
         try {
-            return acessoBanco.getTipo(tipo);
-        } catch (SQLException ex) {
+            tipo = acessoBanco.getTipo(tipoId);
+            //System.out.println("==>>> Conversao: obtido tipo " + tipo.getNome() + " !!!");
+        } catch (Exception ex) {
             Logger.getLogger(TipoConverter.class.getName()).log(Level.SEVERE, null, ex);
+            //System.out.println("==>>> Erro convertendo " + value + " para objeto da classe Tipo!!!");
         }
-        return null;
+        return tipo;
     }
 
     @Override
     public String getAsString(FacesContext context, UIComponent component, Object value) {
-        Tipo tipo = (Tipo) value;
-        return "" + tipo.getId();
+        try {
+            Tipo tipo = (Tipo) value;
+            //System.out.println("==>>> Conversao: obtido id " + tipo.getId() + " do objeto " + tipo.getNome());
+            return "" + tipo.getId();
+        } catch (Exception ex) {
+            Logger.getLogger(TipoConverter.class.getName()).log(Level.SEVERE, null, ex);
+            //System.out.println("==>>> Erro convertendo objeto " + value + " para string com id !!!");
+        }
+        return null;
     }
-    
 }

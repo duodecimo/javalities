@@ -77,9 +77,8 @@
                                         <h:outputLabel value="Numero"/>
                                         <h:inputText value="#{pessoaBean.telefone.numero}"/>
                                         <h:outputLabel value="Tipo"/>
-                                        <h:selectOneMenu value="#{pessoaBean.telefone.tipo}">
+                                        <h:selectOneMenu id="tipo" converter="TipoConverter" value="#{pessoaBean.telefone.tipo}">
                                             <f:selectItems value="#{pessoaBean.tipos}"/>
-                                            <f:converter converterId="org.uss.agendaJdbc.converters.TipoConverter"/>
                                         </h:selectOneMenu>
                                     </h:panelGrid>
                                     <h:commandButton value="Adicionar" action="#{pessoaBean.confirmaAdicionarTelefone()}"/>
