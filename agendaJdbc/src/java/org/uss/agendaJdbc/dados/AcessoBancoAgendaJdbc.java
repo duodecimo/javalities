@@ -167,11 +167,25 @@ public class AcessoBancoAgendaJdbc {
                 + "'" + pessoa.getEmail() + "'" + ")";
         comandar();
         statement1.execute(cmd);
+        // recuperar o valor da chave primaria
+        // (id) gerada pelo banco para a pessoa
+        // recem criada
+        cmd = "SELECT id FROM pessoa WHERE "
+                + "nome='" + pessoa.getNome().trim() + "'";
+        ResultSet resultSet = statement1.executeQuery(cmd);
+        while(resultSet.next()) {
+            pessoa.setId(resultSet.getInt("id"));
+        }
         // incluir telefones eventualmente presentes
         // na lista de telefones do objeto pessoa.
         // observe que como e um novo objeto pessoa,
         // só podem haver telefones para incluir
+        // observe tambem que antes de criar o telefone,
+        // a propriedade pessoa e atualizada:
+        // so agora o objeto pessoa possui o valor
+        // da chave primaria (id) gerada pelo banco. 
         for (Telefone telefone : pessoa.getTelefones()) {
+            telefone.setPessoa(pessoa);
             criarTelefone(telefone);
         }
     }
@@ -251,5 +265,15 @@ public class AcessoBancoAgendaJdbc {
                 + "WHERE id = " + telefone.getId();
         comandar();
         statement2.execute(cmd);
+    }
+
+    public void removerPessoa(Pessoa pessoa) throws SQLException {
+        String cmd = "DELETE FROM pessoa "
+                + "WHERE id = " + pessoa.getId();
+        comandar();
+        statement1.execute(cmd);
+        // obs.: A relação de telefone com pessoa está declarada como 
+        // ON DELETE CASCADE, portanto, ao remover uma pessoa, o banco
+        // deverá remover todos os telefones relavionados a ela.
     }
 }

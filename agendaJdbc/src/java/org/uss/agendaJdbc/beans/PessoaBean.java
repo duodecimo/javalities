@@ -32,8 +32,9 @@ public class PessoaBean implements Serializable {
     private Pessoa pessoa;
     private Telefone telefone;
     private AcessoBancoAgendaJdbc acessoBanco;
-    enum Estado {RECUPERANDO, CRIANDO, ALTERANDO, REMOVENDO, 
-    CRIARTELEFONE, ALTERARTELEFONE};
+    enum Estado {RECUPERANDO, CRIANDO, ALTERANDO, 
+    VISUALIZANDO, REMOVENDO, 
+    CRIANDOTELEFONE, ALTERANDOTELEFONE, REMOVENDOTELEFONE};
     private Estado estado = Estado.RECUPERANDO;
     private Estado estadoPrevio;
     private List<Tipo> tipos;
@@ -101,11 +102,68 @@ public class PessoaBean implements Serializable {
         return null;
     }
 
+    public String remover(Pessoa pessoa) {
+        this.pessoa = pessoa;
+        if(conversation.isTransient()) {
+            conversation.begin();
+        }
+        estado = Estado.REMOVENDO;
+        System.out.println("===>>> Removendo pessoa " + pessoa.getNome());
+        FacesContext.getCurrentInstance().addMessage(null, 
+                new FacesMessage(FacesMessage.SEVERITY_WARN, "Aviso: ", 
+                        "Após confirmar a remoção da pessoa, esta, junto com "
+                                + "todos os seus telefones serão removidos.\n "
+                                + "A operação não poderá ser desfeita."));
+        return null;
+    }
+
+    public String visualizar(Pessoa pessoa) {
+        this.pessoa = pessoa;
+        if(conversation.isTransient()) {
+            conversation.begin();
+        }
+        estado = Estado.VISUALIZANDO;
+        System.out.println("===>>> Visualizar pessoa " + pessoa.getNome());
+        return null;
+    }
+
+    public String operar() {
+        System.out.println("===>>> salvando Alteração/Criação/Remoção");
+        if(acessoBanco == null) {
+            acessoBanco = new AcessoBancoAgendaJdbc();
+        }
+        try {
+            if (isCriando()) {
+                System.out.println("===>>> salvando a pessoa " + pessoa.getNome());
+                acessoBanco.criarPessoa(pessoa);
+            } else if(isAlterando()) {
+                System.out.println("===>>> salvando Alteração da pessoa " + pessoa.getNome());
+                acessoBanco.alterarPessoa(pessoa);
+            } else if(isRemovendo()) {
+                System.out.println("===>>> remover pessoa " + pessoa.getNome());
+                acessoBanco.removerPessoa(pessoa);
+            }
+        } catch (SQLException ex) {
+            System.out.println("Erro em operação de pessoa no banco de dados: " + ex);
+            Logger.getLogger(PessoaBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return abandonar();
+    }
+
+    public String abandonar() {
+        System.out.println("===>>> abandonando Alteração/Criação/Remoção/Visualização");
+        if(!conversation.isTransient()) {
+            conversation.end();
+        }
+        estado = Estado.RECUPERANDO;
+        return null;
+    }
+
     public String adicionarTelefone() {
         telefone = new Telefone();
         telefone.setPessoa(pessoa);
         estadoPrevio = estado;
-        estado = Estado.CRIARTELEFONE;
+        estado = Estado.CRIANDOTELEFONE;
         if(conversation.isTransient()) {
             conversation.begin();
         }
@@ -114,7 +172,7 @@ public class PessoaBean implements Serializable {
     public String alterarTelefone(Telefone telefoneSelecionado) {
         telefone = telefoneSelecionado;
         estadoPrevio = estado;
-        estado = Estado.ALTERARTELEFONE;
+        estado = Estado.ALTERANDOTELEFONE;
         if(conversation.isTransient()) {
             conversation.begin();
         }
@@ -150,35 +208,6 @@ public class PessoaBean implements Serializable {
         return null;
     }
 
-    public String salvar() {
-        System.out.println("===>>> salvando Alteração/Criação");
-        if(acessoBanco == null) {
-            acessoBanco = new AcessoBancoAgendaJdbc();
-        }
-        try {
-            if (isCriando()) {
-                System.out.println("===>>> salvando a pessoa " + pessoa.getNome());
-                acessoBanco.criarPessoa(pessoa);
-            } else if(isAlterando()) {
-                System.out.println("===>>> salvando Alteração da pessoa " + pessoa.getNome());
-                acessoBanco.alterarPessoa(pessoa);
-            }
-        } catch (SQLException ex) {
-            System.out.println("Erro criando: " + ex);
-            Logger.getLogger(PessoaBean.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return abandonar();
-    }
-
-    public String abandonar() {
-        System.out.println("===>>> abandonando Alteração/Criação");
-        if(!conversation.isTransient()) {
-            conversation.end();
-        }
-        estado = Estado.RECUPERANDO;
-        return null;
-    }
-
     public boolean isRecuperando() {
         return estado == Estado.RECUPERANDO;
     }
@@ -195,11 +224,19 @@ public class PessoaBean implements Serializable {
         return estado == Estado.REMOVENDO;
     }
 
+    public boolean isVisualizando() {
+        return estado == Estado.VISUALIZANDO;
+    }
+
     public boolean isCriandoTelefone() {
-        return estado == Estado.CRIARTELEFONE;
+        return estado == Estado.CRIANDOTELEFONE;
     }
 
     public boolean isAlterandoTelefone() {
-        return estado == Estado.ALTERARTELEFONE;
+        return estado == Estado.ALTERANDOTELEFONE;
+    }
+
+    public boolean isRemovendoTelefone() {
+        return estado == Estado.REMOVENDOTELEFONE;
     }
 }

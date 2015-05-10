@@ -20,6 +20,7 @@
                 <center>
                     <f:view>
                         <h:form>
+                            <!-- Mostra a tela de navegação de pessoa -->
                             <h:panelGroup rendered="#{pessoaBean.recuperando}">
                                 <h:form>
                                     <h:dataTable value="#{pessoaBean.pessoas}" var="item" border="1">
@@ -38,13 +39,20 @@
                                         <h:column>
                                             <h:commandButton value="Alterar" action="#{pessoaBean.alterar(item)}"/>
                                         </h:column>
+                                        <h:column>
+                                            <h:commandButton value="Remover" action="#{pessoaBean.remover(item)}"/>
+                                        </h:column>
+                                        <h:column>
+                                            <h:commandButton value="Visualizar" action="#{pessoaBean.visualizar(item)}"/>
+                                        </h:column>
                                     </h:dataTable>
                                     <h:commandButton value="Nova Pessoa" action="#{pessoaBean.criar()}"/>
                                 </h:form>
                             </h:panelGroup>
+
+                            <!-- Mostra a tela de edição de pessoa -->
                             <h:panelGroup rendered="#{pessoaBean.criando || pessoaBean.alterando}">
                                 <h:form>
-
                                     <h:panelGrid columns="2">
                                         <h:outputLabel value="Nome"/>
                                         <h:inputText value="#{pessoaBean.pessoa.nome}"/>
@@ -70,10 +78,49 @@
                                     </h:dataTable>
                                     <h:commandButton value="Adicionar telefone" action="#{pessoaBean.adicionarTelefone()}"/>
                                     <p/>
-                                    <h:commandButton value="Salvar" action="#{pessoaBean.salvar()}"/>
+                                    <h:commandButton value="Salvar" action="#{pessoaBean.operar()}"/>
                                     <h:commandButton value="Abandonar" action="#{pessoaBean.abandonar()}"/>
                                 </h:form>
                             </h:panelGroup>
+
+                            <!-- Mostra a tela de remoção ou visualização de pessoa -->
+                            <h:panelGroup rendered="#{pessoaBean.removendo || pessoaBean.visualizando}">
+                                <h:form>
+                                    <h:panelGrid columns="2">
+                                        <h:outputLabel value="Nome"/>
+                                        <h:inputText value="#{pessoaBean.pessoa.nome}" readonly="true"/>
+                                        <h:outputLabel value="Email"/>
+                                        <h:inputText value="#{pessoaBean.pessoa.email}" readonly="true"/>
+                                    </h:panelGrid>
+                                    <h:dataTable value="#{pessoaBean.pessoa.telefones}" var="item" border="1">
+                                        <h:column>
+                                            <f:facet name="header">
+                                                Numero
+                                            </f:facet>
+                                            <h:outputText value="#{item.numero}"/>
+                                        </h:column>
+                                        <h:column>
+                                            <f:facet name="header">
+                                                Tipo
+                                            </f:facet>
+                                            <h:outputText value="#{item.tipo}"/>
+                                        </h:column>
+                                    </h:dataTable>
+                                    <p/>
+                                    <!-- os botões 'Confirma remoção' e 'Abandonar'só são renderizados 
+                                    quando pessoaBean está no estado removendo -->
+                                    <h:panelGroup rendered="#{pessoaBean.removendo}">
+                                        <h:commandButton value="Confirma remo&ccedil;&atilde;o" 
+                                                         action="#{pessoaBean.operar()}"/>
+                                        <h:commandButton value="Abandonar" action="#{pessoaBean.abandonar()}"/>
+                                    </h:panelGroup>
+                                    <!-- quando pessoaBean está no estado visualizando, 
+                                    o botão 'Retornar' é renderizado -->
+                                    <h:commandButton value="Retornar" rendered="#{pessoaBean.visualizando}" 
+                                                     action="#{pessoaBean.abandonar()}"/>
+                                </h:form>
+                            </h:panelGroup>
+
                             <h:panelGroup rendered="#{pessoaBean.criandoTelefone || pessoaBean.alterandoTelefone}">
                                 <h:form>
                                     <h:panelGrid columns="2">
