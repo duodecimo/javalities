@@ -41,7 +41,9 @@
 
                                     <h:panelGrid columns="2">
                                         <h:outputLabel value="Nome"/>
-                                        <h:inputText value="#{tipoBean.tipo.nome}"/>
+                                        <h:inputText value="#{tipoBean.tipo.nome}" 
+                                                     required="true" 
+                                                     requiredMessage="O nome do tipo n&atilde;o pode ficar em branco!"/>
                                     </h:panelGrid>
                                     <h:commandButton value="Salvar" action="#{tipoBean.salvar()}"/>
                                     <h:commandButton value="Abandonar" action="#{tipoBean.abandonar()}"/>

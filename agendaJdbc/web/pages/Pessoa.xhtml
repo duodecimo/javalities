@@ -55,7 +55,9 @@
                                 <h:form>
                                     <h:panelGrid columns="2">
                                         <h:outputLabel value="Nome"/>
-                                        <h:inputText value="#{pessoaBean.pessoa.nome}"/>
+                                        <h:inputText value="#{pessoaBean.pessoa.nome}" 
+                                                     required="true" 
+                                                     requiredMessage="O nome da pessoa n&atilde;o pode ficar em branco!"/>
                                         <h:outputLabel value="Email"/>
                                         <h:inputText value="#{pessoaBean.pessoa.email}"/>
                                     </h:panelGrid>
