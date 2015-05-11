@@ -141,7 +141,7 @@ public class VerificarBancoJdbc {
             try {
                 String cmd = "CREATE TABLE telefone("
                         + "id INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT telefonePK PRIMARY KEY, "
-                        + "numero VARCHAR(20) CONSTRAINT telefoneNumeroUnique UNIQUE, "
+                        + "numero VARCHAR(20) NOT NULL, "
                         + "tipo INT, "
                         + "pessoa INT"
                         + ")";

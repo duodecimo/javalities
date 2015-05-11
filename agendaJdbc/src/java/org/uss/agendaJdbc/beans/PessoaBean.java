@@ -169,10 +169,21 @@ public class PessoaBean implements Serializable {
         }
         return null;
     }
+
     public String alterarTelefone(Telefone telefoneSelecionado) {
         telefone = telefoneSelecionado;
         estadoPrevio = estado;
         estado = Estado.ALTERANDOTELEFONE;
+        if(conversation.isTransient()) {
+            conversation.begin();
+        }
+        return null;
+    }
+
+    public String removerTelefone(Telefone telefoneSelecionado) {
+        telefone = telefoneSelecionado;
+        estadoPrevio = estado;
+        estado = Estado.REMOVENDOTELEFONE;
         if(conversation.isTransient()) {
             conversation.begin();
         }
@@ -194,6 +205,17 @@ public class PessoaBean implements Serializable {
         FacesContext.getCurrentInstance().addMessage(null, 
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso: ", 
                         "Telefone alterado. Alteração só terá efeito após salvar pessoa."));
+        return abandonaTelefone();
+    }
+
+    public String confirmaRemoverTelefone() {
+        pessoa.getTelefones().remove(telefone);
+        FacesContext.getCurrentInstance().addMessage(null, 
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Aviso: ", 
+                        "Telefone removido. Alteração só terá efeito após salvar pessoa."));
+        //System.out.println("===>>>> Adicionado telefone " + telefone.getNumero() + 
+        //        " a pessoa " + pessoa.getNome() +
+        //        " voltando para estado " + estadoPrevio);
         return abandonaTelefone();
     }
 

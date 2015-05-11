@@ -13,6 +13,7 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -250,7 +251,26 @@ public class AcessoBancoAgendaJdbc {
         statement1.execute(cmd);
         // ao alterar uma pessoa, e preciso verificar
         // a lista de telefones da pessoa, podem ter
-        // havido inclusoes e alterações.
+        // havido inclusoes, alterações e remoções.
+        // obter lista de telefones persistidos no banco
+        List<Telefone> telefonesPersistidos = getTelefones(pessoa.getId(), pessoa);
+        // remover telefones persistidos ausentes da lista de telefones do objeto pessoa
+        boolean found;
+        System.out.println("!!!!=== preparando para remover telefones!!!");
+        for (Telefone t : telefonesPersistidos) {
+            found = false;
+            for(Telefone telefone : pessoa.getTelefones()) {
+                if(Objects.equals(t.getId(), telefone.getId())) {
+                    found = true;
+                    System.out.println("     ===> telefone " + t.getNumero() + " encontrado, não será removido !!!!");
+                }
+            }
+            if(!found) {
+                // remover
+                System.out.println("     xx ===> telefone " + t.getNumero() + " não encontrado, será removido !!!!");
+                removerTelefone(t);
+            }
+        }
         //System.out.println("===>>>> Alterando pessoa: atualizando telefones!");
         for (Telefone telefone : pessoa.getTelefones()) {
             //System.out.println("===>>>>    Iterando telefone " + telefone.getNumero());
@@ -299,5 +319,12 @@ public class AcessoBancoAgendaJdbc {
         // obs.: A relação de telefone com pessoa está declarada como 
         // ON DELETE CASCADE, portanto, ao remover uma pessoa, o banco
         // deverá remover todos os telefones relavionados a ela.
+    }
+
+    public void removerTelefone(Telefone telefone) throws SQLException {
+        String cmd = "DELETE FROM telefone "
+                + "WHERE id = " + telefone.getId();
+        comandar();
+        statement2.execute(cmd);
     }
 }

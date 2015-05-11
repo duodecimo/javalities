@@ -87,6 +87,9 @@
                                         <h:column>
                                             <h:commandButton value="Alterar" action="#{pessoaBean.alterarTelefone(item)}"/>
                                         </h:column>
+                                        <h:column>
+                                            <h:commandButton value="Remover" action="#{pessoaBean.removerTelefone(item)}"/>
+                                        </h:column>
                                     </h:dataTable>
                                     <h:commandButton value="Adicionar telefone" action="#{pessoaBean.adicionarTelefone()}"/>
                                     <p/>
@@ -143,6 +146,7 @@
                                 </h:form>
                             </h:panelGroup>
 
+                            <!-- tela de edição de telefone -->
                             <h:panelGroup rendered="#{pessoaBean.criandoTelefone || pessoaBean.alterandoTelefone}">
                                 <h:form>
                                     <h:panelGrid columns="2">
@@ -162,6 +166,22 @@
                                     <h:commandButton value="Retornar" 
                                                      rendered="#{pessoaBean.alterandoTelefone}"
                                                      action="#{pessoaBean.confirmaAlterarTelefone()}"/>
+                                </h:form>
+                            </h:panelGroup>
+
+                            <!-- tela de remoção de telefone -->
+                            <h:panelGroup rendered="#{pessoaBean.removendoTelefone}">
+                                <h:form>
+                                    <h:panelGrid columns="2">
+                                        <h:outputLabel value="Numero"/>
+                                        <h:inputText value="#{pessoaBean.telefone.numero}" readonly="true"/>
+                                        <h:outputLabel value="Tipo"/>
+                                        <h:inputText value="#{pessoaBean.telefone.tipo.nome}" readonly="true"/>
+                                    </h:panelGrid>
+                                    <h:commandButton value="Remover" 
+                                                     action="#{pessoaBean.confirmaRemoverTelefone()}"/>
+                                    <h:commandButton value="Abandonar" 
+                                                     action="#{pessoaBean.abandonaTelefone()}"/>
                                 </h:form>
                             </h:panelGroup>
                         </h:form>
