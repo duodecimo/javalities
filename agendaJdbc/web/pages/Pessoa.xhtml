@@ -60,6 +60,16 @@
                                                      requiredMessage="O nome da pessoa n&atilde;o pode ficar em branco!"/>
                                         <h:outputLabel value="Email"/>
                                         <h:inputText value="#{pessoaBean.pessoa.email}"/>
+                                        <h:outputLabel value="Pontos RPG"/>
+                                        <h:inputText value="#{pessoaBean.pessoa.pontos}">
+                                            <f:convertNumber pattern="#,##0.00" locale="pt_BR"/>
+                                        </h:inputText>
+                                        <h:outputLabel value="Validade dos pontos"/>
+                                        <h:inputText value="#{pessoaBean.pessoa.validade}">
+                                            <f:convertDateTime pattern="dd/MM/yyyy" 
+                                                               locale="pt_BR"
+                                                               timeZone="America/Sao_Paulo"/>
+                                        </h:inputText>
                                     </h:panelGrid>
                                     <h:dataTable value="#{pessoaBean.pessoa.telefones}" var="item" border="1">
                                         <h:column>
@@ -93,6 +103,16 @@
                                         <h:inputText value="#{pessoaBean.pessoa.nome}" readonly="true"/>
                                         <h:outputLabel value="Email"/>
                                         <h:inputText value="#{pessoaBean.pessoa.email}" readonly="true"/>
+                                        <h:outputLabel value="Pontos RPG"/>
+                                        <h:inputText value="#{pessoaBean.pessoa.pontos}" readonly="true">
+                                            <f:convertNumber pattern="#,##0.00" locale="pt_BR"/>
+                                        </h:inputText>
+                                        <h:outputLabel value="Validade dos pontos"/>
+                                        <h:inputText value="#{pessoaBean.pessoa.validade}" readonly="true">
+                                            <f:convertDateTime pattern="dd/MM/yyyy" 
+                                                               locale="pt_BR"
+                                                               timeZone="America/Sao_Paulo"/>
+                                        </h:inputText>
                                     </h:panelGrid>
                                     <h:dataTable value="#{pessoaBean.pessoa.telefones}" var="item" border="1">
                                         <h:column>

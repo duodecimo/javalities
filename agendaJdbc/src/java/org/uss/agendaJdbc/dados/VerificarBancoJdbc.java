@@ -96,8 +96,12 @@ public class VerificarBancoJdbc {
                 String cmd = "CREATE TABLE pessoa("
                         + "id INT NOT NULL GENERATED ALWAYS AS IDENTITY CONSTRAINT pessoaPK PRIMARY KEY, "
                         + "nome VARCHAR(255) CONSTRAINT pessoaNomeUnique UNIQUE, "
-                        + "email VARCHAR(255)"
+                        + "email VARCHAR(255), pontos DECIMAL(12, 2), validade DATE"
                         + ")";
+                // obtido do JavaDb: 
+                // CREATE TABLE PESSOA (ID INTEGER DEFAULT AUTOINCREMENT: start 1 increment 1  
+                // NOT NULL GENERATED ALWAYS AS IDENTITY, NOME VARCHAR(255), EMAIL VARCHAR(255), 
+                // PONTOS DECIMAL(12, 2), VALIDADE DATE, PRIMARY KEY (ID));
                 comandar();
                 statement1.execute(cmd);
                 // nesta sessão não é mais nescessaŕio verificar a tabela pessoa

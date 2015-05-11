@@ -10,6 +10,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class AcessoBancoAgendaJdbc {
 
     public List<Pessoa> getPessoas() throws SQLException {
         Pessoa pessoa;
-        String cmd = "SELECT id, nome, email FROM pessoa ORDER BY nome";
+        String cmd = "SELECT id, nome, email, pontos, validade FROM pessoa ORDER BY nome";
         List<Pessoa> pessoas;
         comandar();
         try (ResultSet resultSet = statement1.executeQuery(cmd)) {
@@ -66,6 +67,8 @@ public class AcessoBancoAgendaJdbc {
                 pessoa.setId(resultSet.getInt("id"));
                 pessoa.setNome(resultSet.getString("nome"));
                 pessoa.setEmail(resultSet.getString("email"));
+                pessoa.setPontos(resultSet.getDouble("pontos"));
+                pessoa.setValidade(resultSet.getDate("validade"));
                 pessoas.add(pessoa);
             }
         }
@@ -78,7 +81,7 @@ public class AcessoBancoAgendaJdbc {
 
     public Pessoa getPessoa(int pessoaId) throws SQLException {
         Pessoa pessoa = null;
-        String cmd = "SELECT id, nome, email FROM pessoa WHERE id = " + pessoaId;
+        String cmd = "SELECT id, nome, email, pontos, validade FROM pessoa WHERE id = " + pessoaId;
         comandar();
         ResultSet resultSet = statement1.executeQuery(cmd);
         while(resultSet.next()) {
@@ -86,6 +89,8 @@ public class AcessoBancoAgendaJdbc {
             pessoa.setId(resultSet.getInt("id"));
             pessoa.setNome(resultSet.getString("nome"));
             pessoa.setEmail(resultSet.getString("email"));
+            pessoa.setPontos(resultSet.getDouble("pontos"));
+            pessoa.setValidade(resultSet.getDate("validade"));
             // sempre que recuperar uma pessoa, adicionar
             // a lista de telefones desta pessoa
             pessoa.setTelefones(getTelefones(pessoa.getId(), pessoa));
@@ -161,10 +166,14 @@ public class AcessoBancoAgendaJdbc {
     }
 
     public void criarPessoa(Pessoa pessoa) throws SQLException {
-        String cmd = "INSERT INTO pessoa values("
-                + "default, "
-                + "'" + pessoa.getNome() + "'" + ", "
-                + "'" + pessoa.getEmail() + "'" + ")";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String cmd = "INSERT INTO pessoa values(" +
+                "default, " + 
+                "'" + pessoa.getNome() + "'" + ", " + 
+                "'" + pessoa.getEmail() + "'" + ", " + 
+                pessoa.getPontos() + ", " + 
+                "'" + simpleDateFormat.format(pessoa.getValidade()) + "'" + 
+                ")";
         comandar();
         statement1.execute(cmd);
         // recuperar o valor da chave primaria
@@ -216,11 +225,16 @@ public class AcessoBancoAgendaJdbc {
     }
 
     public void alterarPessoa(Pessoa pessoa) throws SQLException {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String cmd = "UPDATE pessoa "
                 + "SET nome = "
                 + "'" + pessoa.getNome() + "'" + ", "
                 + "email = "
-                + "'" + pessoa.getEmail() + "' "
+                + "'" + pessoa.getEmail() + "' " + ", "
+                + "pontos = "
+                + pessoa.getPontos()  + ", "
+                + "validade = "
+                + "'" + simpleDateFormat.format(pessoa.getValidade()) + "' "
                 + "WHERE id = " + pessoa.getId();
         comandar();
         statement1.execute(cmd);
