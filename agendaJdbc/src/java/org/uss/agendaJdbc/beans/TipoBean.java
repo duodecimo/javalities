@@ -12,6 +12,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 import org.uss.agendaJdbc.dados.AcessoBancoAgendaJdbc;
@@ -70,7 +72,22 @@ public class TipoBean implements Serializable {
         return null;
     }
 
-    public String salvar() {
+    public String remover(Tipo tipo) {
+        this.tipo = tipo;
+        if(conversation.isTransient()) {
+            conversation.begin();
+        }
+        estado = Estado.REMOVENDO;
+        System.out.println("===>>> Removendo tipo " + tipo.getNome());
+        FacesContext.getCurrentInstance().addMessage(null, 
+                new FacesMessage(FacesMessage.SEVERITY_WARN, "Aviso: ", 
+                        "Após confirmar a remoção do tipo, este, caso não "
+                                + "existam telefones associados a ele, será removido.\n "
+                                + "A operação não poderá ser desfeita."));
+        return null;
+    }
+
+    public String operar() {
         if(acessoBanco == null) {
             acessoBanco = new AcessoBancoAgendaJdbc();
         }
@@ -79,6 +96,9 @@ public class TipoBean implements Serializable {
                 acessoBanco.criarTipo(tipo);
             } else if(isAlterando()) {
                 acessoBanco.alterarTipo(tipo);
+            } else if(isRemovendo()) {
+                System.out.println("===>>> remover tipo " + tipo.getNome());
+                acessoBanco.removerTipo(tipo);
             }
         } catch (SQLException ex) {
             System.out.println("Erro criando: " + ex);

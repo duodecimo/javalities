@@ -321,6 +321,13 @@ public class AcessoBancoAgendaJdbc {
         // deverá remover todos os telefones relavionados a ela.
     }
 
+    public void removerTipo(Tipo tipo) throws SQLException {
+        String cmd = "DELETE FROM tipo "
+                + "WHERE id = " + tipo.getId();
+        comandar();
+        statement1.execute(cmd);
+    }
+
     public void removerTelefone(Telefone telefone) throws SQLException {
         String cmd = "DELETE FROM telefone "
                 + "WHERE id = " + telefone.getId();

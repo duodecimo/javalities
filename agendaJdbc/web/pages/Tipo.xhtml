@@ -32,23 +32,41 @@
                                         <h:column>
                                             <h:commandButton value="Alterar" action="#{tipoBean.alterar(item)}"/>
                                         </h:column>
+                                        <h:column>
+                                            <h:commandButton value="Remover" action="#{tipoBean.remover(item)}"/>
+                                        </h:column>
                                     </h:dataTable>
                                     <h:commandButton value="Novo Tipo" action="#{tipoBean.criar()}"/>
                                 </h:form>
                             </h:panelGroup>
+
+                            <!-- formulário de edição de tipo -->
                             <h:panelGroup rendered="#{tipoBean.criando || tipoBean.alterando}">
                                 <h:form>
-
                                     <h:panelGrid columns="2">
                                         <h:outputLabel value="Nome"/>
                                         <h:inputText value="#{tipoBean.tipo.nome}" 
                                                      required="true" 
                                                      requiredMessage="O nome do tipo n&atilde;o pode ficar em branco!"/>
                                     </h:panelGrid>
-                                    <h:commandButton value="Salvar" action="#{tipoBean.salvar()}"/>
+                                    <h:commandButton value="Salvar" action="#{tipoBean.operar()}"/>
                                     <h:commandButton value="Abandonar" action="#{tipoBean.abandonar()}"/>
                                 </h:form>
                             </h:panelGroup>
+
+                            <!-- formulário de remoção de tipo -->
+                            <h:panelGroup rendered="#{tipoBean.removendo}">
+                                <h:form>
+                                    <h:panelGrid columns="2">
+                                        <h:outputLabel value="Nome"/>
+                                        <h:inputText value="#{tipoBean.tipo.nome}" 
+                                                     readonly="true"/>
+                                    </h:panelGrid>
+                                    <h:commandButton value="Remover" action="#{tipoBean.operar()}"/>
+                                    <h:commandButton value="Abandonar" action="#{tipoBean.abandonar()}"/>
+                                </h:form>
+                            </h:panelGroup>
+
                         </h:form>
                     </f:view>
                 </center>
