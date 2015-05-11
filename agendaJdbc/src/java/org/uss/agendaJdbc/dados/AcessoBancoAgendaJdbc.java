@@ -166,6 +166,9 @@ public class AcessoBancoAgendaJdbc {
     }
 
     public void criarPessoa(Pessoa pessoa) throws SQLException {
+        // exemplo de comando do JavaDB:
+        // INSERT INTO AGENDAJDBC.PESSOA (NOME, EMAIL, PONTOS, VALIDADE) 
+	// VALUES ('Astofoboldo Neves', 'astofo@gmail.com', 80.50, '2015-08-11');
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String cmd = "INSERT INTO pessoa values(" +
                 "default, " + 
@@ -200,6 +203,10 @@ public class AcessoBancoAgendaJdbc {
     }
 
     public void criarTipo(Tipo tipo) throws SQLException {
+        // exemplo de comando do JavaDB:
+        // INSERT INTO AGENDAJDBC.TIPO (NOME) 
+	// VALUES ('residencial');
+
         String cmd = "INSERT INTO tipo values("
                 + "default, "
                 + "'" + tipo.getNome() + "'" +  ")";
@@ -214,6 +221,9 @@ public class AcessoBancoAgendaJdbc {
      * @throws SQLException 
      */
     protected void criarTelefone(Telefone telefone) throws SQLException {
+        // exemplo de comando do JavaDB:
+        // INSERT INTO AGENDAJDBC.TELEFONE (NUMERO, TIPO, PESSOA) 
+	// VALUES ('(24) 99888877', 2, 3);
         String cmd = "INSERT INTO telefone values("
                 + "default, "
                 + "'" + telefone.getNumero()+ "'" + ", "

@@ -98,7 +98,7 @@ public class VerificarBancoJdbc {
                         + "nome VARCHAR(255) CONSTRAINT pessoaNomeUnique UNIQUE, "
                         + "email VARCHAR(255), pontos DECIMAL(12, 2), validade DATE"
                         + ")";
-                // obtido do JavaDb: 
+                // comando de criação obtido do JavaDb: 
                 // CREATE TABLE PESSOA (ID INTEGER DEFAULT AUTOINCREMENT: start 1 increment 1  
                 // NOT NULL GENERATED ALWAYS AS IDENTITY, NOME VARCHAR(255), EMAIL VARCHAR(255), 
                 // PONTOS DECIMAL(12, 2), VALIDADE DATE, PRIMARY KEY (ID));
@@ -132,6 +132,9 @@ public class VerificarBancoJdbc {
     }
 
     private void verificarTabelaTelefone() {
+        // comando de criação obtido do JavaDb:
+        // CREATE TABLE TELEFONE (ID INTEGER DEFAULT AUTOINCREMENT: start 1 increment 1  NOT NULL 
+        // GENERATED ALWAYS AS IDENTITY, NUMERO VARCHAR(20), TIPO INTEGER, PESSOA INTEGER, PRIMARY KEY (ID));
         if (!verificadoTabelaTelefone) {
             // tabela telefone ainda não foi verificada nesta sessão
             verificarBanco();
