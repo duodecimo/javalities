@@ -8,6 +8,7 @@ package org.uss.agendaJdbc.dados;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -19,6 +20,7 @@ public class Pessoa {
     private String email;
     private Double pontos;
     private Date validade;
+    private ImageIcon imagem;
     private List<Telefone> telefones;
 
     public String getNome() {
@@ -70,5 +72,13 @@ public class Pessoa {
 
     public void setTelefones(List<Telefone> telefones) {
         this.telefones = telefones;
+    }
+
+    public ImageIcon getImagem() {
+        return imagem;
+    }
+
+    public void setImagem(ImageIcon imagem) {
+        this.imagem = imagem;
     }
 }

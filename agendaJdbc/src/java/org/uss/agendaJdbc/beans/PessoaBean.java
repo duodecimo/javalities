@@ -20,6 +20,10 @@ import org.uss.agendaJdbc.dados.AcessoBancoAgendaJdbc;
 import org.uss.agendaJdbc.dados.Pessoa;
 import org.uss.agendaJdbc.dados.Telefone;
 import org.uss.agendaJdbc.dados.Tipo;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Scanner;
+import javax.servlet.http.Part;
 
 /**
  *
@@ -38,6 +42,9 @@ public class PessoaBean implements Serializable {
     private Estado estado = Estado.RECUPERANDO;
     private Estado estadoPrevio;
     private List<Tipo> tipos;
+    private Part uploadedFile;
+    private String text;
+    
 
     public Pessoa getPessoa() {
         return pessoa;
@@ -53,6 +60,22 @@ public class PessoaBean implements Serializable {
 
     public void setTelefone(Telefone telefone) {
         this.telefone = telefone;
+    }
+
+    public Part getUploadedFile() {
+        return uploadedFile;
+    }
+
+    public void setUploadedFile(Part uploadedFile) {
+        this.uploadedFile = uploadedFile;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
     public List<Pessoa> getPessoas() {
@@ -261,4 +284,15 @@ public class PessoaBean implements Serializable {
     public boolean isRemovendoTelefone() {
         return estado == Estado.REMOVENDOTELEFONE;
     }
+
+    public void upload() {
+
+        if (null != uploadedFile) {
+            try {
+                InputStream is = uploadedFile.getInputStream();
+            } catch (IOException ex) {
+            }
+        }
+    }
+
 }
