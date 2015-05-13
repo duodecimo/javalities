@@ -22,8 +22,9 @@ import org.uss.agendaJdbc.dados.Telefone;
 import org.uss.agendaJdbc.dados.Tipo;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Scanner;
+import java.io.ObjectInputStream;
 import javax.servlet.http.Part;
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -43,7 +44,6 @@ public class PessoaBean implements Serializable {
     private Estado estadoPrevio;
     private List<Tipo> tipos;
     private Part uploadedFile;
-    private String text;
     
 
     public Pessoa getPessoa() {
@@ -68,14 +68,6 @@ public class PessoaBean implements Serializable {
 
     public void setUploadedFile(Part uploadedFile) {
         this.uploadedFile = uploadedFile;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
     }
 
     public List<Pessoa> getPessoas() {
@@ -285,14 +277,17 @@ public class PessoaBean implements Serializable {
         return estado == Estado.REMOVENDOTELEFONE;
     }
 
-    public void upload() {
+    public void uploadPessoaImagem() {
 
         if (null != uploadedFile) {
             try {
-                InputStream is = uploadedFile.getInputStream();
+                try (ObjectInputStream objectInputStream = new ObjectInputStream(uploadedFile.getInputStream())) {
+                    pessoa.setImagem(((ImageIcon) objectInputStream.readObject()));
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(PessoaBean.class.getName()).log(Level.SEVERE, null, ex);
+                }
             } catch (IOException ex) {
             }
         }
     }
-
 }

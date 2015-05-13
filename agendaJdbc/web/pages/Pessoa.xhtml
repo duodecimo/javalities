@@ -52,7 +52,7 @@
 
                             <!-- Mostra a tela de edição de pessoa -->
                             <h:panelGroup rendered="#{pessoaBean.criando || pessoaBean.alterando}">
-                                <h:form id="form" enctype="multipart/form-data" prependId="false>
+                                <h:form enctype="multipart/form-data">
                                     <h:panelGrid columns="2">
                                         <h:outputLabel value="Nome"/>
                                         <h:inputText value="#{pessoaBean.pessoa.nome}" 
@@ -71,8 +71,7 @@
                                                                timeZone="America/Sao_Paulo"/>
                                         </h:inputText>
                                         <h:outputLabel value="Imagem: "/>
-                                        <h:inputFile id="file" value="#{pessoaBean.uploadedFile}">
-                                        </h:inputFile>
+                                        <h:inputFile id="file" value="#{pessoaBean.uploadedFile}"/>
                                     </h:panelGrid>
                                     <h:dataTable value="#{pessoaBean.pessoa.telefones}" var="item" border="1">
                                         <h:column>

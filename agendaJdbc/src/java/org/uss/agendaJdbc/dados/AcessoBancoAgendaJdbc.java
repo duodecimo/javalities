@@ -5,6 +5,10 @@
  */
 package org.uss.agendaJdbc.dados;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -14,6 +18,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.ImageIcon;
 
 /**
  *
@@ -58,7 +65,7 @@ public class AcessoBancoAgendaJdbc {
 
     public List<Pessoa> getPessoas() throws SQLException {
         Pessoa pessoa;
-        String cmd = "SELECT id, nome, email, pontos, validade FROM pessoa ORDER BY nome";
+        String cmd = "SELECT id, nome, email, pontos, validade, imagem FROM pessoa ORDER BY nome";
         List<Pessoa> pessoas;
         comandar();
         try (ResultSet resultSet = statement1.executeQuery(cmd)) {
@@ -70,6 +77,14 @@ public class AcessoBancoAgendaJdbc {
                 pessoa.setEmail(resultSet.getString("email"));
                 pessoa.setPontos(resultSet.getDouble("pontos"));
                 pessoa.setValidade(resultSet.getDate("validade"));
+            try {
+                pessoa.setImagem((ImageIcon) 
+                        new ObjectInputStream(resultSet.getBlob("imagem").
+                                getBinaryStream()).readObject());
+            } catch (IOException | ClassNotFoundException ex) {
+                Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).
+                        log(Level.SEVERE, null, ex);
+            }
                 pessoas.add(pessoa);
             }
         }
@@ -82,7 +97,7 @@ public class AcessoBancoAgendaJdbc {
 
     public Pessoa getPessoa(int pessoaId) throws SQLException {
         Pessoa pessoa = null;
-        String cmd = "SELECT id, nome, email, pontos, validade FROM pessoa WHERE id = " + pessoaId;
+        String cmd = "SELECT id, nome, email, pontos, validade, imagem FROM pessoa WHERE id = " + pessoaId;
         comandar();
         ResultSet resultSet = statement1.executeQuery(cmd);
         while(resultSet.next()) {
@@ -92,6 +107,14 @@ public class AcessoBancoAgendaJdbc {
             pessoa.setEmail(resultSet.getString("email"));
             pessoa.setPontos(resultSet.getDouble("pontos"));
             pessoa.setValidade(resultSet.getDate("validade"));
+            try {
+                pessoa.setImagem((ImageIcon) 
+                        new ObjectInputStream(resultSet.getBlob("imagem").
+                                getBinaryStream()).readObject());
+            } catch (IOException | ClassNotFoundException ex) {
+                Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).
+                        log(Level.SEVERE, null, ex);
+            }
             // sempre que recuperar uma pessoa, adicionar
             // a lista de telefones desta pessoa
             pessoa.setTelefones(getTelefones(pessoa.getId(), pessoa));
@@ -168,7 +191,7 @@ public class AcessoBancoAgendaJdbc {
 
     public void criarPessoa(Pessoa pessoa) throws SQLException {
         // exemplo de comando do JavaDB:
-        // INSERT INTO AGENDAJDBC.PESSOA (NOME, EMAIL, PONTOS, VALIDADE) 
+        // INSERT INTO AGENDAJDBC.PESSOA (NOME, EMAIL, PONTOS, VALIDADE, IMAGEM) 
 	// VALUES ('Astofoboldo Neves', 'astofo@gmail.com', 80.50, '2015-08-11');
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String cmd = "INSERT INTO pessoa values(" +
@@ -176,7 +199,8 @@ public class AcessoBancoAgendaJdbc {
                 "'" + pessoa.getNome() + "'" + ", " + 
                 "'" + pessoa.getEmail() + "'" + ", " + 
                 pessoa.getPontos() + ", " + 
-                "'" + simpleDateFormat.format(pessoa.getValidade()) + "'" + 
+                "'" + simpleDateFormat.format(pessoa.getValidade()) + "', " +
+                getBlobImagemPessoa(pessoa) + 
                 ")";
         comandar();
         statement1.execute(cmd);
@@ -245,7 +269,9 @@ public class AcessoBancoAgendaJdbc {
                 + "pontos = "
                 + pessoa.getPontos()  + ", "
                 + "validade = "
-                + "'" + simpleDateFormat.format(pessoa.getValidade()) + "' "
+                + "'" + simpleDateFormat.format(pessoa.getValidade()) + "', "
+                + "imagem = "
+                + getBlobImagemPessoa(pessoa) + " "
                 + "WHERE id = " + pessoa.getId();
         comandar();
         statement1.execute(cmd);
@@ -333,5 +359,19 @@ public class AcessoBancoAgendaJdbc {
                 + "WHERE id = " + telefone.getId();
         comandar();
         statement2.execute(cmd);
+    }
+
+    public Blob getBlobImagemPessoa(Pessoa pessoa) {
+        Blob blob = null;
+        try {
+            blob = connection1.createBlob();
+            ObjectOutputStream objectOutputStream;
+            objectOutputStream = new ObjectOutputStream(blob.setBinaryStream(1));
+            objectOutputStream.writeObject(pessoa.getImagem());
+            objectOutputStream.close();
+        } catch (SQLException | IOException ex) {
+            Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return blob;
     }
 }
