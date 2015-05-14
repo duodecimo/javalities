@@ -19,172 +19,162 @@
             <ui:define name="content">
                 <center>
                     <f:view>
-                        <h:form>
+                        <h:form enctype="multipart/form-data">
                             <!-- Mostra a tela de navegação de pessoa -->
                             <h:panelGroup rendered="#{pessoaBean.recuperando}">
-                                <h:form>
-                                    <h:dataTable value="#{pessoaBean.pessoas}" var="item" border="1">
-                                        <h:column>
-                                            <f:facet name="header">
-                                                Nome
-                                            </f:facet>
-                                            <h:outputText value="#{item.nome}"/>
-                                        </h:column>
-                                        <h:column>
-                                            <f:facet name="header">
-                                                Email
-                                            </f:facet>
-                                            <h:outputText value="#{item.email}"/>
-                                        </h:column>
-                                        <h:column>
-                                            <h:commandButton value="Alterar" action="#{pessoaBean.alterar(item)}"/>
-                                        </h:column>
-                                        <h:column>
-                                            <h:commandButton value="Remover" action="#{pessoaBean.remover(item)}"/>
-                                        </h:column>
-                                        <h:column>
-                                            <h:commandButton value="Visualizar" action="#{pessoaBean.visualizar(item)}"/>
-                                        </h:column>
-                                    </h:dataTable>
-                                    <h:commandButton value="Nova Pessoa" action="#{pessoaBean.criar()}"/>
-                                </h:form>
+                                <h:dataTable value="#{pessoaBean.pessoas}" var="item" border="1">
+                                    <h:column>
+                                        <f:facet name="header">
+                                            Nome
+                                        </f:facet>
+                                        <h:outputText value="#{item.nome}"/>
+                                    </h:column>
+                                    <h:column>
+                                        <f:facet name="header">
+                                            Email
+                                        </f:facet>
+                                        <h:outputText value="#{item.email}"/>
+                                    </h:column>
+                                    <h:column>
+                                        <h:commandButton value="Alterar" action="#{pessoaBean.alterar(item)}"/>
+                                    </h:column>
+                                    <h:column>
+                                        <h:commandButton value="Remover" action="#{pessoaBean.remover(item)}"/>
+                                    </h:column>
+                                    <h:column>
+                                        <h:commandButton value="Visualizar" action="#{pessoaBean.visualizar(item)}"/>
+                                    </h:column>
+                                </h:dataTable>
+                                <h:commandButton value="Nova Pessoa" action="#{pessoaBean.criar()}"/>
                             </h:panelGroup>
 
                             <!-- Mostra a tela de edição de pessoa -->
                             <h:panelGroup rendered="#{pessoaBean.criando || pessoaBean.alterando}">
-                                <h:form enctype="multipart/form-data">
-                                    <h:panelGrid columns="2">
-                                        <h:outputLabel value="Nome"/>
-                                        <h:inputText value="#{pessoaBean.pessoa.nome}" 
-                                                     required="true" 
-                                                     requiredMessage="O nome da pessoa n&atilde;o pode ficar em branco!"/>
-                                        <h:outputLabel value="Email"/>
-                                        <h:inputText value="#{pessoaBean.pessoa.email}"/>
-                                        <h:outputLabel value="Pontos RPG"/>
-                                        <h:inputText value="#{pessoaBean.pessoa.pontos}">
-                                            <f:convertNumber pattern="#,##0.00" locale="pt_BR"/>
-                                        </h:inputText>
-                                        <h:outputLabel value="Validade dos pontos"/>
-                                        <h:inputText value="#{pessoaBean.pessoa.validade}">
-                                            <f:convertDateTime pattern="dd/MM/yyyy" 
-                                                               locale="pt_BR"
-                                                               timeZone="America/Sao_Paulo"/>
-                                        </h:inputText>
-                                        <h:outputLabel value="Imagem: "/>
-                                        <h:inputFile id="file" value="#{pessoaBean.uploadedFile}"/>
-                                    </h:panelGrid>
-                                    <h:dataTable value="#{pessoaBean.pessoa.telefones}" var="item" border="1">
-                                        <h:column>
-                                            <f:facet name="header">
-                                                Numero
-                                            </f:facet>
-                                            <h:outputText value="#{item.numero}"/>
-                                        </h:column>
-                                        <h:column>
-                                            <f:facet name="header">
-                                                Tipo
-                                            </f:facet>
-                                            <h:outputText value="#{item.tipo}"/>
-                                        </h:column>
-                                        <h:column>
-                                            <h:commandButton value="Alterar" action="#{pessoaBean.alterarTelefone(item)}"/>
-                                        </h:column>
-                                        <h:column>
-                                            <h:commandButton value="Remover" action="#{pessoaBean.removerTelefone(item)}"/>
-                                        </h:column>
-                                    </h:dataTable>
-                                    <h:commandButton value="Adicionar telefone" action="#{pessoaBean.adicionarTelefone()}"/>
-                                    <p/>
-                                    <h:commandButton value="Salvar" action="#{pessoaBean.operar()}"/>
-                                    <h:commandButton value="Abandonar" action="#{pessoaBean.abandonar()}"/>
-                                </h:form>
+                                <h:panelGrid columns="2">
+                                    <h:outputLabel value="Nome"/>
+                                    <h:inputText value="#{pessoaBean.pessoa.nome}" 
+                                                 required="true" 
+                                                 requiredMessage="O nome da pessoa n&atilde;o pode ficar em branco!"/>
+                                    <h:outputLabel value="Email"/>
+                                    <h:inputText value="#{pessoaBean.pessoa.email}"/>
+                                    <h:outputLabel value="Pontos RPG"/>
+                                    <h:inputText value="#{pessoaBean.pessoa.pontos}">
+                                        <f:convertNumber pattern="#,##0.00" locale="pt_BR"/>
+                                    </h:inputText>
+                                    <h:outputLabel value="Validade dos pontos"/>
+                                    <h:inputText value="#{pessoaBean.pessoa.validade}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy" 
+                                                           locale="pt_BR"
+                                                           timeZone="America/Sao_Paulo"/>
+                                    </h:inputText>
+                                    <h:outputLabel value="Imagem: "/>
+                                    <h:inputFile id="file" value="#{pessoaBean.uploadedFile}"/>
+                                </h:panelGrid>
+                                <h:dataTable value="#{pessoaBean.pessoa.telefones}" var="item" border="1">
+                                    <h:column>
+                                        <f:facet name="header">
+                                            Numero
+                                        </f:facet>
+                                        <h:outputText value="#{item.numero}"/>
+                                    </h:column>
+                                    <h:column>
+                                        <f:facet name="header">
+                                            Tipo
+                                        </f:facet>
+                                        <h:outputText value="#{item.tipo}"/>
+                                    </h:column>
+                                    <h:column>
+                                        <h:commandButton value="Alterar" action="#{pessoaBean.alterarTelefone(item)}"/>
+                                    </h:column>
+                                    <h:column>
+                                        <h:commandButton value="Remover" action="#{pessoaBean.removerTelefone(item)}"/>
+                                    </h:column>
+                                </h:dataTable>
+                                <h:commandButton value="Adicionar telefone" action="#{pessoaBean.adicionarTelefone()}"/>
+                                <p/>
+                                <h:commandButton value="Salvar" action="#{pessoaBean.operar()}"/>
+                                <h:commandButton value="Abandonar" action="#{pessoaBean.abandonar()}"/>
                             </h:panelGroup>
 
                             <!-- Mostra a tela de remoção ou visualização de pessoa -->
                             <h:panelGroup rendered="#{pessoaBean.removendo || pessoaBean.visualizando}">
-                                <h:form>
-                                    <h:panelGrid columns="2">
-                                        <h:outputLabel value="Nome"/>
-                                        <h:inputText value="#{pessoaBean.pessoa.nome}" readonly="true"/>
-                                        <h:outputLabel value="Email"/>
-                                        <h:inputText value="#{pessoaBean.pessoa.email}" readonly="true"/>
-                                        <h:outputLabel value="Pontos RPG"/>
-                                        <h:inputText value="#{pessoaBean.pessoa.pontos}" readonly="true">
-                                            <f:convertNumber pattern="#,##0.00" locale="pt_BR"/>
-                                        </h:inputText>
-                                        <h:outputLabel value="Validade dos pontos"/>
-                                        <h:inputText value="#{pessoaBean.pessoa.validade}" readonly="true">
-                                            <f:convertDateTime pattern="dd/MM/yyyy" 
-                                                               locale="pt_BR"
-                                                               timeZone="America/Sao_Paulo"/>
-                                        </h:inputText>
-                                    </h:panelGrid>
-                                    <h:dataTable value="#{pessoaBean.pessoa.telefones}" var="item" border="1">
-                                        <h:column>
-                                            <f:facet name="header">
-                                                Numero
-                                            </f:facet>
-                                            <h:outputText value="#{item.numero}"/>
-                                        </h:column>
-                                        <h:column>
-                                            <f:facet name="header">
-                                                Tipo
-                                            </f:facet>
-                                            <h:outputText value="#{item.tipo}"/>
-                                        </h:column>
-                                    </h:dataTable>
-                                    <p/>
-                                    <!-- os botões 'Confirma remoção' e 'Abandonar'só são renderizados 
-                                    quando pessoaBean está no estado removendo -->
-                                    <h:panelGroup rendered="#{pessoaBean.removendo}">
-                                        <h:commandButton value="Confirma remo&ccedil;&atilde;o" 
-                                                         action="#{pessoaBean.operar()}"/>
-                                        <h:commandButton value="Abandonar" action="#{pessoaBean.abandonar()}"/>
-                                    </h:panelGroup>
-                                    <!-- quando pessoaBean está no estado visualizando, 
-                                    o botão 'Retornar' é renderizado -->
-                                    <h:commandButton value="Retornar" rendered="#{pessoaBean.visualizando}" 
-                                                     action="#{pessoaBean.abandonar()}"/>
-                                </h:form>
+                                <h:panelGrid columns="2">
+                                    <h:outputLabel value="Nome"/>
+                                    <h:inputText value="#{pessoaBean.pessoa.nome}" readonly="true"/>
+                                    <h:outputLabel value="Email"/>
+                                    <h:inputText value="#{pessoaBean.pessoa.email}" readonly="true"/>
+                                    <h:outputLabel value="Pontos RPG"/>
+                                    <h:inputText value="#{pessoaBean.pessoa.pontos}" readonly="true">
+                                        <f:convertNumber pattern="#,##0.00" locale="pt_BR"/>
+                                    </h:inputText>
+                                    <h:outputLabel value="Validade dos pontos"/>
+                                    <h:inputText value="#{pessoaBean.pessoa.validade}" readonly="true">
+                                        <f:convertDateTime pattern="dd/MM/yyyy" 
+                                                           locale="pt_BR"
+                                                           timeZone="America/Sao_Paulo"/>
+                                    </h:inputText>
+                                </h:panelGrid>
+                                <h:dataTable value="#{pessoaBean.pessoa.telefones}" var="item" border="1">
+                                    <h:column>
+                                        <f:facet name="header">
+                                            Numero
+                                        </f:facet>
+                                        <h:outputText value="#{item.numero}"/>
+                                    </h:column>
+                                    <h:column>
+                                        <f:facet name="header">
+                                            Tipo
+                                        </f:facet>
+                                        <h:outputText value="#{item.tipo}"/>
+                                    </h:column>
+                                </h:dataTable>
+                                <p/>
+                                <!-- os botões 'Confirma remoção' e 'Abandonar'só são renderizados 
+                                quando pessoaBean está no estado removendo -->
+                                <h:panelGroup rendered="#{pessoaBean.removendo}">
+                                    <h:commandButton value="Confirma remo&ccedil;&atilde;o" 
+                                                     action="#{pessoaBean.operar()}"/>
+                                    <h:commandButton value="Abandonar" action="#{pessoaBean.abandonar()}"/>
+                                </h:panelGroup>
+                                <!-- quando pessoaBean está no estado visualizando, 
+                                o botão 'Retornar' é renderizado -->
+                                <h:commandButton value="Retornar" rendered="#{pessoaBean.visualizando}" 
+                                                 action="#{pessoaBean.abandonar()}"/>
                             </h:panelGroup>
 
                             <!-- tela de edição de telefone -->
                             <h:panelGroup rendered="#{pessoaBean.criandoTelefone || pessoaBean.alterandoTelefone}">
-                                <h:form>
-                                    <h:panelGrid columns="2">
-                                        <h:outputLabel value="Numero"/>
-                                        <h:inputText value="#{pessoaBean.telefone.numero}"/>
-                                        <h:outputLabel value="Tipo"/>
-                                        <h:selectOneMenu id="tipo" converter="TipoConverter" value="#{pessoaBean.telefone.tipo}">
-                                            <f:selectItems value="#{pessoaBean.tipos}"/>
-                                        </h:selectOneMenu>
-                                    </h:panelGrid>
-                                    <h:commandButton value="Adicionar" 
-                                                     rendered="#{pessoaBean.criandoTelefone}"
-                                                     action="#{pessoaBean.confirmaAdicionarTelefone()}"/>
-                                    <h:commandButton value="Abandonar" 
-                                                     rendered="#{pessoaBean.criandoTelefone}"
-                                                     action="#{pessoaBean.abandonaTelefone()}"/>
-                                    <h:commandButton value="Retornar" 
-                                                     rendered="#{pessoaBean.alterandoTelefone}"
-                                                     action="#{pessoaBean.confirmaAlterarTelefone()}"/>
-                                </h:form>
+                                <h:panelGrid columns="2">
+                                    <h:outputLabel value="Numero"/>
+                                    <h:inputText value="#{pessoaBean.telefone.numero}"/>
+                                    <h:outputLabel value="Tipo"/>
+                                    <h:selectOneMenu id="tipo" converter="TipoConverter" value="#{pessoaBean.telefone.tipo}">
+                                        <f:selectItems value="#{pessoaBean.tipos}"/>
+                                    </h:selectOneMenu>
+                                </h:panelGrid>
+                                <h:commandButton value="Adicionar" 
+                                                 rendered="#{pessoaBean.criandoTelefone}"
+                                                 action="#{pessoaBean.confirmaAdicionarTelefone()}"/>
+                                <h:commandButton value="Abandonar" 
+                                                 rendered="#{pessoaBean.criandoTelefone}"
+                                                 action="#{pessoaBean.abandonaTelefone()}"/>
+                                <h:commandButton value="Retornar" 
+                                                 rendered="#{pessoaBean.alterandoTelefone}"
+                                                 action="#{pessoaBean.confirmaAlterarTelefone()}"/>
                             </h:panelGroup>
 
                             <!-- tela de remoção de telefone -->
                             <h:panelGroup rendered="#{pessoaBean.removendoTelefone}">
-                                <h:form>
-                                    <h:panelGrid columns="2">
-                                        <h:outputLabel value="Numero"/>
-                                        <h:inputText value="#{pessoaBean.telefone.numero}" readonly="true"/>
-                                        <h:outputLabel value="Tipo"/>
-                                        <h:inputText value="#{pessoaBean.telefone.tipo.nome}" readonly="true"/>
-                                    </h:panelGrid>
-                                    <h:commandButton value="Remover" 
-                                                     action="#{pessoaBean.confirmaRemoverTelefone()}"/>
-                                    <h:commandButton value="Abandonar" 
-                                                     action="#{pessoaBean.abandonaTelefone()}"/>
-                                </h:form>
+                                <h:panelGrid columns="2">
+                                    <h:outputLabel value="Numero"/>
+                                    <h:inputText value="#{pessoaBean.telefone.numero}" readonly="true"/>
+                                    <h:outputLabel value="Tipo"/>
+                                    <h:inputText value="#{pessoaBean.telefone.tipo.nome}" readonly="true"/>
+                                </h:panelGrid>
+                                <h:commandButton value="Remover" 
+                                                 action="#{pessoaBean.confirmaRemoverTelefone()}"/>
+                                <h:commandButton value="Abandonar" 
+                                                 action="#{pessoaBean.abandonaTelefone()}"/>
                             </h:panelGroup>
                         </h:form>
                     </f:view>

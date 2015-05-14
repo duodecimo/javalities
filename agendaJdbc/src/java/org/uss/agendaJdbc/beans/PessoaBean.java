@@ -21,7 +21,6 @@ import org.uss.agendaJdbc.dados.Pessoa;
 import org.uss.agendaJdbc.dados.Telefone;
 import org.uss.agendaJdbc.dados.Tipo;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import javax.servlet.http.Part;
 import javax.swing.ImageIcon;
@@ -68,6 +67,9 @@ public class PessoaBean implements Serializable {
 
     public void setUploadedFile(Part uploadedFile) {
         this.uploadedFile = uploadedFile;
+        System.out.println("===>>> arquivo de imagem nome: " + uploadedFile.getName() + 
+                " recebido do jsf, tentando armazenar em pessoa.");
+        uploadPessoaImagem();
     }
 
     public List<Pessoa> getPessoas() {
@@ -282,11 +284,16 @@ public class PessoaBean implements Serializable {
         if (null != uploadedFile) {
             try {
                 try (ObjectInputStream objectInputStream = new ObjectInputStream(uploadedFile.getInputStream())) {
-                    pessoa.setImagem(((ImageIcon) objectInputStream.readObject()));
+                    pessoa.setImagem((ImageIcon) objectInputStream.readObject());
+                    System.out.println("===>>> imagem adicionada a pessoa: " + 
+                            pessoa.getImagem().getIconHeight() + " X " + 
+                            pessoa.getImagem().getIconWidth() + " (heigh x width)");
                 } catch (ClassNotFoundException ex) {
                     Logger.getLogger(PessoaBean.class.getName()).log(Level.SEVERE, null, ex);
+                    System.out.println("===>>> problema adicionando imagem a pessoa: " + ex.getMessage());
                 }
             } catch (IOException ex) {
+                System.out.println("===>>> problema adicionando imagem a pessoa: " + ex.getMessage());
             }
         }
     }

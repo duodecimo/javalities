@@ -11,10 +11,10 @@ import java.io.ObjectOutputStream;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +31,7 @@ public class AcessoBancoAgendaJdbc {
     private Connection connection2;
     private Statement statement1;
     private Statement statement2;
+    private Blob blob;
     
     private void conectar() throws SQLException {
         if(connection1 == null) {
@@ -70,21 +71,23 @@ public class AcessoBancoAgendaJdbc {
         comandar();
         try (ResultSet resultSet = statement1.executeQuery(cmd)) {
             pessoas = new ArrayList<>();
-            while(resultSet.next()) {
+            while (resultSet.next()) {
                 pessoa = new Pessoa();
                 pessoa.setId(resultSet.getInt("id"));
                 pessoa.setNome(resultSet.getString("nome"));
                 pessoa.setEmail(resultSet.getString("email"));
                 pessoa.setPontos(resultSet.getDouble("pontos"));
                 pessoa.setValidade(resultSet.getDate("validade"));
-            try {
-                pessoa.setImagem((ImageIcon) 
-                        new ObjectInputStream(resultSet.getBlob("imagem").
+                blob = resultSet.getBlob("imagem");
+                if (blob != null) {
+                    try {
+                        pessoa.setImagem((ImageIcon) new ObjectInputStream(blob.
                                 getBinaryStream()).readObject());
-            } catch (IOException | ClassNotFoundException ex) {
-                Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).
-                        log(Level.SEVERE, null, ex);
-            }
+                    } catch (IOException | ClassNotFoundException ex) {
+                        Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).
+                                log(Level.SEVERE, null, ex);
+                    }
+                } else pessoa.setImagem(null);
                 pessoas.add(pessoa);
             }
         }
@@ -107,13 +110,17 @@ public class AcessoBancoAgendaJdbc {
             pessoa.setEmail(resultSet.getString("email"));
             pessoa.setPontos(resultSet.getDouble("pontos"));
             pessoa.setValidade(resultSet.getDate("validade"));
-            try {
-                pessoa.setImagem((ImageIcon) 
-                        new ObjectInputStream(resultSet.getBlob("imagem").
-                                getBinaryStream()).readObject());
-            } catch (IOException | ClassNotFoundException ex) {
-                Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).
-                        log(Level.SEVERE, null, ex);
+            blob = resultSet.getBlob("imagem");
+            if (blob != null) {
+                try {
+                    pessoa.setImagem((ImageIcon) new ObjectInputStream(blob.
+                            getBinaryStream()).readObject());
+                } catch (IOException | ClassNotFoundException ex) {
+                    Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).
+                            log(Level.SEVERE, null, ex);
+                }
+            } else {
+                pessoa.setImagem(null);
             }
             // sempre que recuperar uma pessoa, adicionar
             // a lista de telefones desta pessoa
@@ -193,17 +200,24 @@ public class AcessoBancoAgendaJdbc {
         // exemplo de comando do JavaDB:
         // INSERT INTO AGENDAJDBC.PESSOA (NOME, EMAIL, PONTOS, VALIDADE, IMAGEM) 
 	// VALUES ('Astofoboldo Neves', 'astofo@gmail.com', 80.50, '2015-08-11');
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String cmd = "INSERT INTO pessoa values(" +
-                "default, " + 
-                "'" + pessoa.getNome() + "'" + ", " + 
-                "'" + pessoa.getEmail() + "'" + ", " + 
-                pessoa.getPontos() + ", " + 
-                "'" + simpleDateFormat.format(pessoa.getValidade()) + "', " +
-                getBlobImagemPessoa(pessoa) + 
-                ")";
-        comandar();
-        statement1.execute(cmd);
+        String cmd = 
+                "INSERT INTO pessoa(nome, email, pontos, validade, imagem)"
+                + " values(?, ?, ?, ?, ?)";
+        PreparedStatement preparedStatement = connection1.prepareStatement(cmd);
+        preparedStatement.setString(1, pessoa.getNome());
+        preparedStatement.setString(2, pessoa.getEmail());
+        preparedStatement.setDouble(3, pessoa.getPontos());
+        preparedStatement.setDate(4, new java.sql.Date(pessoa.getValidade().getTime()));
+        blob = connection1.createBlob();
+        try {
+            ObjectOutputStream objectOutputStream
+                    = new ObjectOutputStream(blob.setBinaryStream(1));
+            objectOutputStream.writeObject(pessoa.getImagem());
+            preparedStatement.setBlob(5, blob);
+        } catch (SQLException | IOException sQLException) {
+            System.out.println("======>>>>> problema populando o blob: " + sQLException);
+        }
+        preparedStatement.execute();
         // recuperar o valor da chave primaria
         // (id) gerada pelo banco para a pessoa
         // recem criada
@@ -260,21 +274,26 @@ public class AcessoBancoAgendaJdbc {
     }
 
     public void alterarPessoa(Pessoa pessoa) throws SQLException {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String cmd = "UPDATE pessoa "
-                + "SET nome = "
-                + "'" + pessoa.getNome() + "'" + ", "
-                + "email = "
-                + "'" + pessoa.getEmail() + "' " + ", "
-                + "pontos = "
-                + pessoa.getPontos()  + ", "
-                + "validade = "
-                + "'" + simpleDateFormat.format(pessoa.getValidade()) + "', "
-                + "imagem = "
-                + getBlobImagemPessoa(pessoa) + " "
+        String cmd = 
+                "UPDATE pessoa SET nome = ?, email = ?, pontos = ?, "
+                + "validade = ?, imagem = ?"
                 + "WHERE id = " + pessoa.getId();
-        comandar();
-        statement1.execute(cmd);
+        PreparedStatement preparedStatement = connection1.prepareStatement(cmd);
+        preparedStatement.setString(1, pessoa.getNome());
+        preparedStatement.setString(2, pessoa.getEmail());
+        preparedStatement.setDouble(3, pessoa.getPontos());
+        preparedStatement.setDate(4, new java.sql.Date(pessoa.getValidade().getTime()));
+        blob = connection1.createBlob();
+        try {
+            ObjectOutputStream objectOutputStream
+                    = new ObjectOutputStream(blob.setBinaryStream(1));
+            objectOutputStream.writeObject(pessoa.getImagem());
+            preparedStatement.setBlob(5, blob);
+        } catch (SQLException | IOException sQLException) {
+            System.out.println("======>>>>> problema populando o blob: " + sQLException);
+        }
+        preparedStatement.execute();
+        System.out.println("======>>>>> Comando que grava com blob: " + cmd);
         // ao alterar uma pessoa, e preciso verificar
         // a lista de telefones da pessoa, podem ter
         // havido inclusoes, alterações e remoções.
@@ -359,19 +378,5 @@ public class AcessoBancoAgendaJdbc {
                 + "WHERE id = " + telefone.getId();
         comandar();
         statement2.execute(cmd);
-    }
-
-    public Blob getBlobImagemPessoa(Pessoa pessoa) {
-        Blob blob = null;
-        try {
-            blob = connection1.createBlob();
-            ObjectOutputStream objectOutputStream;
-            objectOutputStream = new ObjectOutputStream(blob.setBinaryStream(1));
-            objectOutputStream.writeObject(pessoa.getImagem());
-            objectOutputStream.close();
-        } catch (SQLException | IOException ex) {
-            Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return blob;
     }
 }
