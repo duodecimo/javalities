@@ -22,6 +22,7 @@ import org.uss.agendaJdbc.dados.Telefone;
 import org.uss.agendaJdbc.dados.Tipo;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import javax.imageio.ImageIO;
 import javax.servlet.http.Part;
 import javax.swing.ImageIcon;
 
@@ -67,8 +68,10 @@ public class PessoaBean implements Serializable {
 
     public void setUploadedFile(Part uploadedFile) {
         this.uploadedFile = uploadedFile;
-        System.out.println("===>>> arquivo de imagem nome: " + uploadedFile.getName() + 
-                " recebido do jsf, tentando armazenar em pessoa.");
+        System.out.println("===>>> arquivo de imagem nome: " + 
+                uploadedFile.getSubmittedFileName() +
+                " do tipo " + uploadedFile.getContentType() +
+                " recebido do jsf para ser armazenado em pessoa.");
         uploadPessoaImagem();
     }
 
@@ -283,17 +286,11 @@ public class PessoaBean implements Serializable {
 
         if (null != uploadedFile) {
             try {
-                try (ObjectInputStream objectInputStream = new ObjectInputStream(uploadedFile.getInputStream())) {
-                    pessoa.setImagem((ImageIcon) objectInputStream.readObject());
-                    System.out.println("===>>> imagem adicionada a pessoa: " + 
-                            pessoa.getImagem().getIconHeight() + " X " + 
-                            pessoa.getImagem().getIconWidth() + " (heigh x width)");
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(PessoaBean.class.getName()).log(Level.SEVERE, null, ex);
-                    System.out.println("===>>> problema adicionando imagem a pessoa: " + ex.getMessage());
-                }
+                pessoa.setImagem(new ImageIcon(ImageIO.read(uploadedFile.getInputStream())));
             } catch (IOException ex) {
-                System.out.println("===>>> problema adicionando imagem a pessoa: " + ex.getMessage());
+                System.out.println("===>>> problema adicionando arquivo " + uploadedFile.getSubmittedFileName() +
+                        " do tipo " + uploadedFile.getContentType() +
+                        " da imagem a pessoa: " + ex.getMessage());
             }
         }
     }
