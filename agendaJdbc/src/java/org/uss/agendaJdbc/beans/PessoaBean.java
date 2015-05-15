@@ -25,6 +25,7 @@ import java.io.ObjectInputStream;
 import javax.imageio.ImageIO;
 import javax.servlet.http.Part;
 import javax.swing.ImageIcon;
+import org.primefaces.model.DefaultStreamedContent;
 
 /**
  *
