@@ -5,6 +5,9 @@
  */
 package org.uss.agendaJdbc.beans;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
@@ -21,11 +24,10 @@ import org.uss.agendaJdbc.dados.Pessoa;
 import org.uss.agendaJdbc.dados.Telefone;
 import org.uss.agendaJdbc.dados.Tipo;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import javax.imageio.ImageIO;
+import javax.faces.event.PhaseId;
 import javax.servlet.http.Part;
-import javax.swing.ImageIcon;
 import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 
 /**
  *
@@ -45,6 +47,7 @@ public class PessoaBean implements Serializable {
     private Estado estadoPrevio;
     private List<Tipo> tipos;
     private Part uploadedFile;
+    private StreamedContent imagemPessoa;
     
 
     public Pessoa getPessoa() {
@@ -74,6 +77,14 @@ public class PessoaBean implements Serializable {
                 " do tipo " + uploadedFile.getContentType() +
                 " recebido do jsf para ser armazenado em pessoa.");
         uploadPessoaImagem();
+    }
+
+    public StreamedContent getImagemPessoa() {
+        return imagemPessoa;
+    }
+
+    public void setImagemPessoa(StreamedContent imagemPessoa) {
+        this.imagemPessoa = imagemPessoa;
     }
 
     public List<Pessoa> getPessoas() {
@@ -115,11 +126,17 @@ public class PessoaBean implements Serializable {
 
     public String alterar(Pessoa pessoa) {
         this.pessoa = pessoa;
+        System.out.println("===>>> Alterando pessoa " +pessoa.getNome() + 
+                " imagem tamanho: " + pessoa.getImagem().length);
+        imagemPessoa = getStreamedImage(pessoa.getImagem());
+        System.out.println("===>>> Obtida streamed imagem content encoding = " + 
+                imagemPessoa.getContentEncoding() + 
+                " nome: " + imagemPessoa.getName() + 
+                " content type: " + imagemPessoa.getContentType());
         if(conversation.isTransient()) {
             conversation.begin();
         }
         estado = Estado.ALTERANDO;
-        System.out.println("===>>> Alterando pessoa " + pessoa.getNome());
         return null;
     }
 
@@ -287,12 +304,67 @@ public class PessoaBean implements Serializable {
 
         if (null != uploadedFile) {
             try {
-                pessoa.setImagem(new ImageIcon(ImageIO.read(uploadedFile.getInputStream())));
+                int avail = uploadedFile.getInputStream().available();
+                byte[] bytesFromFile = new byte[avail];
+                uploadedFile.getInputStream().read(bytesFromFile, 0, avail);
+                pessoa.setImagem(bytesFromFile);
             } catch (IOException ex) {
-                System.out.println("===>>> problema adicionando arquivo " + uploadedFile.getSubmittedFileName() +
-                        " do tipo " + uploadedFile.getContentType() +
-                        " da imagem a pessoa: " + ex.getMessage());
+                System.out.println("===>>> problema adicionando arquivo " + uploadedFile.getSubmittedFileName()
+                        + " do tipo " + uploadedFile.getContentType()
+                        + " da imagem a pessoa: " + ex.getMessage());
             }
         }
+    }
+
+    public StreamedContent getStreamedImage(byte[] image) {
+        FacesContext context = FacesContext.getCurrentInstance();
+        System.out.println("===>>> Getting streamed image as StreamedContent tamanho: " + image.length);
+        if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE) {
+            // So, we're rendering the HTML. Return a stub StreamedContent so that it will generate right URL.
+            return new DefaultStreamedContent();
+        } else {
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(pessoa.getImagem());
+            DefaultStreamedContent defaultStreamedContent
+                    = new DefaultStreamedContent(byteArrayInputStream, "image/jpg", pessoa.getId() + "pessoa.jpg");
+            try {
+                System.out.println("===>>> DefaultStreamedContent: " + defaultStreamedContent.getContentEncoding()
+                        + ", " + defaultStreamedContent.getContentType() + ", "
+                        + defaultStreamedContent.getName() + " - tamanho: " + defaultStreamedContent.getStream().available());
+            } catch (IOException ex) {
+                Logger.getLogger(PessoaBean.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("===>>> DefaultStreamedContent: Erro: " + ex);
+            }
+            return defaultStreamedContent;
+        }
+    }
+
+    private DefaultStreamedContent content;
+
+    public StreamedContent getContent()
+    {
+        if(content == null)
+        {
+            /* use your database call here */
+            BufferedInputStream in = new BufferedInputStream(getClass().getClassLoader().getResourceAsStream("/resources/images/tiger.jpg"));
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+            int val = -1;
+            /* this is a simple test method to double check values from the stream */
+            try
+            {
+                while((val = in.read()) != -1)
+                    out.write(val);
+            }
+            catch(IOException e)
+            {
+                e.printStackTrace();
+            }
+
+            byte[] bytes = out.toByteArray();
+            System.out.println("Bytes -> " + bytes.length);
+            content = new DefaultStreamedContent(new ByteArrayInputStream(bytes), "image/png", "test.png");
+        }
+
+        return content;
     }
 }

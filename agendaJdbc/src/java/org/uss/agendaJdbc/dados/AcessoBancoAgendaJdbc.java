@@ -6,7 +6,6 @@
 package org.uss.agendaJdbc.dados;
 
 import java.io.IOException;
-import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.sql.Blob;
 import java.sql.Connection;
@@ -18,9 +17,6 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.ImageIcon;
 
 /**
  *
@@ -78,16 +74,12 @@ public class AcessoBancoAgendaJdbc {
                 pessoa.setEmail(resultSet.getString("email"));
                 pessoa.setPontos(resultSet.getDouble("pontos"));
                 pessoa.setValidade(resultSet.getDate("validade"));
-                blob = resultSet.getBlob("imagem");
-                if (blob != null) {
-                    try {
-                        pessoa.setImagem((ImageIcon) new ObjectInputStream(blob.
-                                getBinaryStream()).readObject());
-                    } catch (IOException | ClassNotFoundException ex) {
-                        Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).
-                                log(Level.SEVERE, null, ex);
-                    }
-                } else pessoa.setImagem(null);
+                try {
+                    pessoa.imagemDeBlob(resultSet.getBlob("imagem"));
+                } catch (SQLException sQLException) {
+                    byte[] b = {1};
+                    pessoa.setImagem(b);
+                }
                 pessoas.add(pessoa);
             }
         }
@@ -110,17 +102,11 @@ public class AcessoBancoAgendaJdbc {
             pessoa.setEmail(resultSet.getString("email"));
             pessoa.setPontos(resultSet.getDouble("pontos"));
             pessoa.setValidade(resultSet.getDate("validade"));
-            blob = resultSet.getBlob("imagem");
-            if (blob != null) {
-                try {
-                    pessoa.setImagem((ImageIcon) new ObjectInputStream(blob.
-                            getBinaryStream()).readObject());
-                } catch (IOException | ClassNotFoundException ex) {
-                    Logger.getLogger(AcessoBancoAgendaJdbc.class.getName()).
-                            log(Level.SEVERE, null, ex);
-                }
-            } else {
-                pessoa.setImagem(null);
+            try {
+                pessoa.imagemDeBlob(resultSet.getBlob("imagem"));
+            } catch (SQLException sQLException) {
+                byte[] b = {1};
+                pessoa.setImagem(b);
             }
             // sempre que recuperar uma pessoa, adicionar
             // a lista de telefones desta pessoa
@@ -285,11 +271,8 @@ public class AcessoBancoAgendaJdbc {
         preparedStatement.setDate(4, new java.sql.Date(pessoa.getValidade().getTime()));
         blob = connection1.createBlob();
         try {
-            ObjectOutputStream objectOutputStream
-                    = new ObjectOutputStream(blob.setBinaryStream(1));
-            objectOutputStream.writeObject(pessoa.getImagem());
-            preparedStatement.setBlob(5, blob);
-        } catch (SQLException | IOException sQLException) {
+            blob = pessoa.imagemParaBlob(blob);
+        } catch (SQLException sQLException) {
             System.out.println("======>>>>> problema populando o blob: " + sQLException);
         }
         preparedStatement.execute();

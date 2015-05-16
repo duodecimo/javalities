@@ -5,22 +5,24 @@
  */
 package org.uss.agendaJdbc.dados;
 
+import java.io.Serializable;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import javax.swing.ImageIcon;
 
 /**
  *
  * @author duo
  */
-public class Pessoa {
+public class Pessoa implements Serializable {
     private Integer id;
     private String nome;
     private String email;
     private Double pontos;
     private Date validade;
-    private ImageIcon imagem;
+    private byte[] imagem;
     private List<Telefone> telefones;
 
     public String getNome() {
@@ -74,11 +76,22 @@ public class Pessoa {
         this.telefones = telefones;
     }
 
-    public ImageIcon getImagem() {
+    public byte[] getImagem() {
         return imagem;
     }
 
-    public void setImagem(ImageIcon imagem) {
+    public void setImagem(byte[] imagem) {
         this.imagem = imagem;
+    }
+
+    public void imagemDeBlob(Blob blob) throws SQLException {
+        if (blob != null) {
+            imagem = blob.getBytes(1L, (int) blob.length());
+        }
+    }
+
+    public Blob imagemParaBlob(Blob blob) throws SQLException {
+        blob.setBytes(1L, imagem);
+        return blob;
     }
 }
