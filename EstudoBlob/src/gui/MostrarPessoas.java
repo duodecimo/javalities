@@ -7,6 +7,7 @@ package gui;
 
 import dados.Pessoa;
 import java.util.List;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 /**
@@ -27,9 +28,9 @@ public class MostrarPessoas extends javax.swing.JPanel {
         pessoa2 = pessoas.get(1);
         initComponents();
         jTextField1.setText(pessoa1.getNome());
-        jButton1.setIcon(pessoa1.getImagem());
+        jButton1.setIcon(new ImageIcon(pessoa1.getImagem()));
         jTextField2.setText(pessoa2.getNome());
-        jButton2.setIcon(pessoa2.getImagem());
+        jButton2.setIcon(new ImageIcon(pessoa2.getImagem()));
         JFrame frame = new JFrame("Pessoas");
         frame.add(this);
         frame.pack();

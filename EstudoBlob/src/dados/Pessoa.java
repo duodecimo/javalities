@@ -5,6 +5,8 @@
  */
 package dados;
 
+import java.sql.Blob;
+import java.sql.SQLException;
 import javax.swing.ImageIcon;
 
 /**
@@ -14,7 +16,7 @@ import javax.swing.ImageIcon;
 public class Pessoa {
     private Integer id;
     private String nome;
-    private ImageIcon imagem;
+    private byte[] imagem;
 
     public String getNome() {
         return nome;
@@ -32,11 +34,20 @@ public class Pessoa {
         this.id = id;
     }
 
-    public ImageIcon getImagem() {
+    public byte[] getImagem() {
         return imagem;
     }
 
-    public void setImagem(ImageIcon imagem) {
+    public void setImagem(byte[] imagem) {
         this.imagem = imagem;
+    }
+
+    public void imagemDeBlob(Blob blob) throws SQLException {
+	imagem = blob.getBytes(1L, (int) blob.length());
+    }
+
+    public Blob imagemParaBlob(Blob blob) throws SQLException {
+        blob.setBytes(1L, imagem);
+        return blob;
     }
 }

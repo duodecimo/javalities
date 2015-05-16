@@ -7,9 +7,10 @@ package estudoblob;
 
 import dados.Pessoa;
 import gui.MostrarPessoas;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -21,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -75,52 +76,55 @@ public class EstudoBlob {
             PreparedStatement prepareStatement = 
                     connection.prepareStatement("INSERT INTO pessoa(nome, imagem) VALUES (?, ?)");
             Blob blob;
-            ObjectOutputStream objectOutputStream;
+            BufferedImage originalImage;
+            ByteArrayOutputStream baos;
+            byte[] imageInByte;
+            
             blob = connection.createBlob();
-            objectOutputStream = new ObjectOutputStream(blob.setBinaryStream(1));
             // adicionar pessoas
             pessoa = new Pessoa();
             pessoa.setNome("Astofoboldo Neves");
-            pessoa.setImagem(new ImageIcon("images/astofoboldo.jpg"));
+            originalImage = ImageIO.read(new File("images/astofoboldo.jpg"));
+            baos = new ByteArrayOutputStream();
+            ImageIO.write( originalImage, "jpg", baos );
+            baos.flush();
+            imageInByte = baos.toByteArray();
+            baos.close();
+            pessoa.setImagem(imageInByte);
             // persistir pessoa
             prepareStatement.setString(1, pessoa.getNome());
             blob = connection.createBlob();
-            objectOutputStream = new ObjectOutputStream(blob.setBinaryStream(1));
-            objectOutputStream.writeObject(pessoa.getImagem());
-            objectOutputStream.close();
+            blob = pessoa.imagemParaBlob(blob);
             prepareStatement.setBlob(2, blob);
             prepareStatement.execute();
             // adicionar pessoas
             pessoa = new Pessoa();
             pessoa.setNome("Miforonalda Esteves");
-            pessoa.setImagem(new ImageIcon("images/miforonalda.jpg"));
+            originalImage = ImageIO.read(new File("images/miforonalda.jpg"));
+            baos = new ByteArrayOutputStream();
+            ImageIO.write( originalImage, "jpg", baos );
+            baos.flush();
+            imageInByte = baos.toByteArray();
+            baos.close();
+            pessoa.setImagem(imageInByte);
             // persistir pessoa
             prepareStatement.setString(1, pessoa.getNome());
             blob = connection.createBlob();
-            objectOutputStream = new ObjectOutputStream(blob.setBinaryStream(1));
-            objectOutputStream.writeObject(pessoa.getImagem());
-            objectOutputStream.close();
+            blob = pessoa.imagemParaBlob(blob);
             prepareStatement.setBlob(2, blob);
             prepareStatement.execute();
             // recuperar dados
             ResultSet resultSet = statement.executeQuery("SELECT * FROM pessoa");
-            ObjectInputStream objectInputStream;
             List<Pessoa> pessoas = new ArrayList<>();
             while(resultSet.next()) {
                 pessoa = new Pessoa();
                 pessoa.setId(resultSet.getInt("id"));
                 pessoa.setNome(resultSet.getString("nome"));
-                objectInputStream = new ObjectInputStream(resultSet.getBlob("imagem").getBinaryStream());
-                try {
-                    pessoa.setImagem((ImageIcon) objectInputStream.readObject());
-                } catch (ClassNotFoundException ex) {
-                    Logger.getLogger(EstudoBlob.class.getName()).log(Level.SEVERE, null, ex);
-                    System.out.println("===>>> Erro recuperando imagem : " + ex);
-                }
+                pessoa.imagemDeBlob(resultSet.getBlob("imagem"));
                 pessoas.add(pessoa);
             }
             // mostar lista de pessoas
-            new MostrarPessoas(pessoas);
+            MostrarPessoas mostrarPessoas = new MostrarPessoas(pessoas);
         } catch (SQLException | IOException ex) {
             Logger.getLogger(EstudoBlob.class.getName()).log(Level.SEVERE, null, ex);
         }
