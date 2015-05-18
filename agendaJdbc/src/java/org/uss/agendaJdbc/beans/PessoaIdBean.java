@@ -8,16 +8,14 @@ package org.uss.agendaJdbc.beans;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.inject.Named;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
+import javax.servlet.http.HttpServletResponse;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
-import org.uss.agendaJdbc.dados.AcessoBancoAgendaJdbc;
 import org.uss.agendaJdbc.dados.Pessoa;
 
 /**
@@ -27,11 +25,15 @@ import org.uss.agendaJdbc.dados.Pessoa;
 @Named
 @SessionScoped
 public class PessoaIdBean implements Serializable {
-    private Integer pessoaId;
     private Pessoa pessoa;
 
     public StreamedContent getStreamedImage() {
-        System.out.println("Pessoa a localizar para imagem tem id (parametro): " + pessoaId);
+        FacesContext context = FacesContext.getCurrentInstance();
+        HttpServletResponse response = (HttpServletResponse) context.getExternalContext().getResponse();
+        response.setHeader("Cache-Control", "no-cache"); // Prevents HTTP 1.1 caching.
+        response.setHeader("Pragma", "no-cache"); // Prevents HTTP 1.0 caching.
+        response.setDateHeader("Expires", -1); // Prevents proxy caching.
+        System.out.println("Pessoa a localizar para imagem tem id (parametro): " + pessoa.getId());
         //Pessoa pessoaDaImagem = new AcessoBancoAgendaJdbc().getPessoa(pessoaId);
         System.out.println("Pessoa localizada para atender requisição de renderizar imagem: " + pessoa.getNome());
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(pessoa.getImagem());
@@ -49,14 +51,6 @@ public class PessoaIdBean implements Serializable {
             System.out.println("===>>> DefaultStreamedContent: Erro: " + ex);
         }
         return defaultStreamedContent;
-    }
-
-    public Integer getPessoaId() {
-        return pessoaId;
-    }
-
-    public void setPessoaId(Integer pessoaId) {
-        this.pessoaId = pessoaId;
     }
 
     public Pessoa getPessoa() {

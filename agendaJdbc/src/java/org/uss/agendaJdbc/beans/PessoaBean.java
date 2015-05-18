@@ -5,7 +5,6 @@
  */
 package org.uss.agendaJdbc.beans;
 
-import java.io.ByteArrayInputStream;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
@@ -22,9 +21,7 @@ import org.uss.agendaJdbc.dados.Pessoa;
 import org.uss.agendaJdbc.dados.Telefone;
 import org.uss.agendaJdbc.dados.Tipo;
 import java.io.IOException;
-import javax.faces.event.PhaseId;
 import javax.servlet.http.Part;
-import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 
 /**
@@ -125,7 +122,6 @@ public class PessoaBean implements Serializable {
 
     public String alterar(Pessoa pessoa) {
         this.pessoa = pessoa;
-        pessoaIdBean.setPessoaId(pessoa.getId());
         pessoaIdBean.setPessoa(pessoa);
         System.out.println("===>>> Alterando pessoa " +pessoa.getNome() + 
                 " imagem tamanho: " + pessoa.getImagem().length);
