@@ -46,6 +46,7 @@ public class PessoaBean implements Serializable {
     private List<Tipo> tipos;
     private Part uploadedFile;
     private StreamedContent imagemPessoa;
+    private @Inject PessoaIdBean pessoaIdBean;
     
 
     public Pessoa getPessoa() {
@@ -124,6 +125,8 @@ public class PessoaBean implements Serializable {
 
     public String alterar(Pessoa pessoa) {
         this.pessoa = pessoa;
+        pessoaIdBean.setPessoaId(pessoa.getId());
+        pessoaIdBean.setPessoa(pessoa);
         System.out.println("===>>> Alterando pessoa " +pessoa.getNome() + 
                 " imagem tamanho: " + pessoa.getImagem().length);
         if(conversation.isTransient()) {

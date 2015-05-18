@@ -28,39 +28,42 @@ import org.uss.agendaJdbc.dados.Pessoa;
 @SessionScoped
 public class PessoaIdBean implements Serializable {
     private Integer pessoaId;
+    private Pessoa pessoa;
 
     public StreamedContent getStreamedImage() {
-        FacesContext context = FacesContext.getCurrentInstance();
-        if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
-            // So, we're rendering the HTML. Return a stub StreamedContent so that it will generate right URL.
-            String pessoaIdStr = context.getExternalContext().getRequestParameterMap().get("pessoaId");
-            System.out.println("Pessoa a localizar para imagem tem id (parametro): " + pessoaId);
-            if(pessoaIdStr != null) {
-                pessoaId = new Integer(pessoaIdStr);
-            }
-            return new DefaultStreamedContent();
-        } else {
-            try {
-                if (pessoaId != null) {
-                    Pessoa pessoaDaImagem = new AcessoBancoAgendaJdbc().getPessoa(pessoaId);
-                    System.out.println("Pessoa localizada para atender requisição de renderizar imagem: " + pessoaDaImagem.getNome());
-                    ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(pessoaDaImagem.getImagem());
-                    DefaultStreamedContent defaultStreamedContent
-                            = new DefaultStreamedContent(byteArrayInputStream, "image/jpg", pessoaDaImagem.getId() + "pessoa.jpg");
-                    try {
-                        System.out.println("===>>> DefaultStreamedContent: " + defaultStreamedContent.getContentEncoding()
-                                + ", " + defaultStreamedContent.getContentType() + ", "
-                                + defaultStreamedContent.getName() + " - tamanho: " + defaultStreamedContent.getStream().available());
-                    } catch (IOException ex) {
-                        Logger.getLogger(PessoaBean.class.getName()).log(Level.SEVERE, null, ex);
-                        System.out.println("===>>> DefaultStreamedContent: Erro: " + ex);
-                    }
-                    return defaultStreamedContent;
-                }
-            } catch (SQLException ex) {
-                Logger.getLogger(PessoaBean.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        System.out.println("Pessoa a localizar para imagem tem id (parametro): " + pessoaId);
+        //Pessoa pessoaDaImagem = new AcessoBancoAgendaJdbc().getPessoa(pessoaId);
+        System.out.println("Pessoa localizada para atender requisição de renderizar imagem: " + pessoa.getNome());
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(pessoa.getImagem());
+        DefaultStreamedContent defaultStreamedContent
+                = new DefaultStreamedContent(byteArrayInputStream);
+        // new DefaultStreamedContent(byteArrayInputStream, "image/jpg", pessoa.getId() + "pessoa.jpg");
+        try {
+            System.out.println("===>>> DefaultStreamedContent: " +  
+                    " - tamanho: " + defaultStreamedContent.getStream().available());
+            //System.out.println("===>>> DefaultStreamedContent: " + defaultStreamedContent.getContentEncoding()
+            //        + ", " + defaultStreamedContent.getContentType() + ", "
+            //        + defaultStreamedContent.getName() + " - tamanho: " + defaultStreamedContent.getStream().available());
+        } catch (IOException ex) {
+            Logger.getLogger(PessoaBean.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("===>>> DefaultStreamedContent: Erro: " + ex);
         }
-        return new DefaultStreamedContent();
+        return defaultStreamedContent;
+    }
+
+    public Integer getPessoaId() {
+        return pessoaId;
+    }
+
+    public void setPessoaId(Integer pessoaId) {
+        this.pessoaId = pessoaId;
+    }
+
+    public Pessoa getPessoa() {
+        return pessoa;
+    }
+
+    public void setPessoa(Pessoa pessoa) {
+        this.pessoa = pessoa;
     }
 }

@@ -273,6 +273,7 @@ public class AcessoBancoAgendaJdbc implements Serializable {
         blob = connection1.createBlob();
         try {
             blob = pessoa.imagemParaBlob(blob);
+            preparedStatement.setBlob(5, blob);
         } catch (SQLException sQLException) {
             System.out.println("======>>>>> problema populando o blob: " + sQLException);
         }

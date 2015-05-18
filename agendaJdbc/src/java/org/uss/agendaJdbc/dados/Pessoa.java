@@ -77,6 +77,9 @@ public class Pessoa implements Serializable {
     }
 
     public byte[] getImagem() {
+        if(imagem == null) {
+            imagem = new byte[] {1};
+        }
         return imagem;
     }
 
