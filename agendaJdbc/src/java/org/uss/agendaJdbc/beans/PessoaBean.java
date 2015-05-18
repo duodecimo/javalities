@@ -5,9 +5,7 @@
  */
 package org.uss.agendaJdbc.beans;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.List;
@@ -128,11 +126,6 @@ public class PessoaBean implements Serializable {
         this.pessoa = pessoa;
         System.out.println("===>>> Alterando pessoa " +pessoa.getNome() + 
                 " imagem tamanho: " + pessoa.getImagem().length);
-        imagemPessoa = getStreamedImage(pessoa.getImagem());
-        System.out.println("===>>> Obtida streamed imagem content encoding = " + 
-                imagemPessoa.getContentEncoding() + 
-                " nome: " + imagemPessoa.getName() + 
-                " content type: " + imagemPessoa.getContentType());
         if(conversation.isTransient()) {
             conversation.begin();
         }
@@ -314,57 +307,5 @@ public class PessoaBean implements Serializable {
                         + " da imagem a pessoa: " + ex.getMessage());
             }
         }
-    }
-
-    public StreamedContent getStreamedImage(byte[] image) {
-        FacesContext context = FacesContext.getCurrentInstance();
-        System.out.println("===>>> Getting streamed image as StreamedContent tamanho: " + image.length);
-        if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE) {
-            // So, we're rendering the HTML. Return a stub StreamedContent so that it will generate right URL.
-            return new DefaultStreamedContent();
-        } else {
-            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(pessoa.getImagem());
-            DefaultStreamedContent defaultStreamedContent
-                    = new DefaultStreamedContent(byteArrayInputStream, "image/jpg", pessoa.getId() + "pessoa.jpg");
-            try {
-                System.out.println("===>>> DefaultStreamedContent: " + defaultStreamedContent.getContentEncoding()
-                        + ", " + defaultStreamedContent.getContentType() + ", "
-                        + defaultStreamedContent.getName() + " - tamanho: " + defaultStreamedContent.getStream().available());
-            } catch (IOException ex) {
-                Logger.getLogger(PessoaBean.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println("===>>> DefaultStreamedContent: Erro: " + ex);
-            }
-            return defaultStreamedContent;
-        }
-    }
-
-    private DefaultStreamedContent content;
-
-    public StreamedContent getContent()
-    {
-        if(content == null)
-        {
-            /* use your database call here */
-            BufferedInputStream in = new BufferedInputStream(getClass().getClassLoader().getResourceAsStream("/resources/images/tiger.jpg"));
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-            int val = -1;
-            /* this is a simple test method to double check values from the stream */
-            try
-            {
-                while((val = in.read()) != -1)
-                    out.write(val);
-            }
-            catch(IOException e)
-            {
-                e.printStackTrace();
-            }
-
-            byte[] bytes = out.toByteArray();
-            System.out.println("Bytes -> " + bytes.length);
-            content = new DefaultStreamedContent(new ByteArrayInputStream(bytes), "image/png", "test.png");
-        }
-
-        return content;
     }
 }

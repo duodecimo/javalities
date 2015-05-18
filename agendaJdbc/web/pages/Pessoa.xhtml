@@ -57,7 +57,9 @@
                                                  required="true" 
                                                  requiredMessage="O nome da pessoa n&atilde;o pode ficar em branco!"/>
                                     <h:outputLabel value="Imagem"/>
-                                    <p:graphicImage value="#{pessoaBean.content}"/>
+                                    <p:graphicImage value="#{pessoaIdBean.streamedImage}">
+                                        <f:param name="pessoaId" value="#{pessoaBean.pessoa.id}"/>
+                                    </p:graphicImage>
                                     <h:outputLabel value="Email"/>
                                     <h:inputText value="#{pessoaBean.pessoa.email}"/>
                                     <h:outputLabel value="Pontos RPG"/>

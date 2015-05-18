@@ -7,6 +7,7 @@ package org.uss.agendaJdbc.dados;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -22,7 +23,7 @@ import java.util.Objects;
  *
  * @author duo
  */
-public class AcessoBancoAgendaJdbc {
+public class AcessoBancoAgendaJdbc implements Serializable {
     private Connection connection1;
     private Connection connection2;
     private Statement statement1;
