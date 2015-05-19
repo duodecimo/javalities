@@ -136,6 +136,7 @@ public class PessoaBean implements Serializable {
 
     public String remover(Pessoa pessoa) {
         this.pessoa = pessoa;
+        pessoaIdBean.setPessoa(pessoa);
         if(conversation.isTransient()) {
             conversation.begin();
         }
@@ -151,6 +152,7 @@ public class PessoaBean implements Serializable {
 
     public String visualizar(Pessoa pessoa) {
         this.pessoa = pessoa;
+        pessoaIdBean.setPessoa(pessoa);
         if(conversation.isTransient()) {
             conversation.begin();
         }

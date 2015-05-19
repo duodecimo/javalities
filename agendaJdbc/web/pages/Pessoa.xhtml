@@ -55,8 +55,8 @@
                                     <h:inputText value="#{pessoaBean.pessoa.nome}" 
                                                  required="true" 
                                                  requiredMessage="O nome da pessoa n&atilde;o pode ficar em branco!"/>
-                                    <h:outputLabel value="Imagem"/>
-                                    <p:graphicImage value="#{pessoaIdBean.streamedImage}"/>
+                                    <h:outputLabel value="Imagem" rendered="#{pessoaBean.alterando}"/>
+                                    <p:graphicImage value="#{pessoaIdBean.streamedImage}" rendered="#{pessoaBean.alterando}"/>
                                     <h:outputLabel value="Email"/>
                                     <h:inputText value="#{pessoaBean.pessoa.email}"/>
                                     <h:outputLabel value="Pontos RPG"/>
@@ -103,6 +103,8 @@
                                 <h:panelGrid columns="2">
                                     <h:outputLabel value="Nome"/>
                                     <h:inputText value="#{pessoaBean.pessoa.nome}" readonly="true"/>
+                                    <h:outputLabel value="Imagem"/>
+                                    <p:graphicImage value="#{pessoaIdBean.streamedImage}"/>
                                     <h:outputLabel value="Email"/>
                                     <h:inputText value="#{pessoaBean.pessoa.email}" readonly="true"/>
                                     <h:outputLabel value="Pontos RPG"/>
