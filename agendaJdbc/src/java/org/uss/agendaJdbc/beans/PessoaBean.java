@@ -68,11 +68,13 @@ public class PessoaBean implements Serializable {
 
     public void setUploadedFile(Part uploadedFile) {
         this.uploadedFile = uploadedFile;
-        System.out.println("===>>> arquivo de imagem nome: " + 
-                uploadedFile.getSubmittedFileName() +
-                " do tipo " + uploadedFile.getContentType() +
-                " recebido do jsf para ser armazenado em pessoa.");
-        uploadPessoaImagem();
+        if (uploadedFile != null) {
+            System.out.println("===>>> arquivo de imagem nome: "
+                    + uploadedFile.getSubmittedFileName()
+                    + " do tipo " + uploadedFile.getContentType()
+                    + " recebido do jsf para ser armazenado em pessoa.");
+            uploadPessoaImagem();
+        }
     }
 
     public StreamedContent getImagemPessoa() {
