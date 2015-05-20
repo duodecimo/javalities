@@ -214,6 +214,20 @@ public class AcessoBancoAgendaJdbc implements Serializable {
         while(resultSet.next()) {
             pessoa.setId(resultSet.getInt("id"));
         }
+        // o insert com o blob parece não estar funcionando, tentar armazenar
+        // com update
+        cmd = 
+                "UPDATE pessoa SET imagem = ?"
+                + " WHERE id = " + pessoa.getId();
+        preparedStatement = connection1.prepareStatement(cmd);
+        blob = connection1.createBlob();
+        try {
+            blob = pessoa.imagemParaBlob(blob);
+            preparedStatement.setBlob(1, blob);
+        } catch (SQLException sQLException) {
+            System.out.println("======>>>>> problema populando o blob: " + sQLException);
+        }
+        preparedStatement.execute();
         // incluir telefones eventualmente presentes
         // na lista de telefones do objeto pessoa.
         // observe que como e um novo objeto pessoa,
@@ -264,7 +278,7 @@ public class AcessoBancoAgendaJdbc implements Serializable {
         String cmd = 
                 "UPDATE pessoa SET nome = ?, email = ?, pontos = ?, "
                 + "validade = ?, imagem = ?"
-                + "WHERE id = " + pessoa.getId();
+                + " WHERE id = " + pessoa.getId();
         PreparedStatement preparedStatement = connection1.prepareStatement(cmd);
         preparedStatement.setString(1, pessoa.getNome());
         preparedStatement.setString(2, pessoa.getEmail());
