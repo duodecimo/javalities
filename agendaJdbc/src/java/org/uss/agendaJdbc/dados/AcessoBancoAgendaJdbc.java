@@ -187,23 +187,16 @@ public class AcessoBancoAgendaJdbc implements Serializable {
         // exemplo de comando do JavaDB:
         // INSERT INTO AGENDAJDBC.PESSOA (NOME, EMAIL, PONTOS, VALIDADE, IMAGEM) 
 	// VALUES ('Astofoboldo Neves', 'astofo@gmail.com', 80.50, '2015-08-11');
+        // att: imagem sera armazenada em seguida com um comando update
+        // dentro de um objeto PreparedStatement.
         String cmd = 
-                "INSERT INTO pessoa(nome, email, pontos, validade, imagem)"
-                + " values(?, ?, ?, ?, ?)";
+                "INSERT INTO pessoa(nome, email, pontos, validade)"
+                + " values(?, ?, ?, ?)";
         PreparedStatement preparedStatement = connection1.prepareStatement(cmd);
         preparedStatement.setString(1, pessoa.getNome());
         preparedStatement.setString(2, pessoa.getEmail());
         preparedStatement.setDouble(3, pessoa.getPontos());
         preparedStatement.setDate(4, new java.sql.Date(pessoa.getValidade().getTime()));
-        blob = connection1.createBlob();
-        try {
-            ObjectOutputStream objectOutputStream
-                    = new ObjectOutputStream(blob.setBinaryStream(1));
-            objectOutputStream.writeObject(pessoa.getImagem());
-            preparedStatement.setBlob(5, blob);
-        } catch (SQLException | IOException sQLException) {
-            System.out.println("======>>>>> problema populando o blob: " + sQLException);
-        }
         preparedStatement.execute();
         // recuperar o valor da chave primaria
         // (id) gerada pelo banco para a pessoa
@@ -214,8 +207,8 @@ public class AcessoBancoAgendaJdbc implements Serializable {
         while(resultSet.next()) {
             pessoa.setId(resultSet.getInt("id"));
         }
-        // o insert com o blob parece não estar funcionando, tentar armazenar
-        // com update
+        // o insert com o blob parece não estar funcionando,
+        // mas o update (em preparedStatement) funciona:
         cmd = 
                 "UPDATE pessoa SET imagem = ?"
                 + " WHERE id = " + pessoa.getId();

@@ -302,6 +302,7 @@ public class PessoaBean implements Serializable {
             try {
                 int avail = uploadedFile.getInputStream().available();
                 byte[] bytesFromFile = new byte[avail];
+                // ajustar tamanho para 60x50
                 uploadedFile.getInputStream().read(bytesFromFile, 0, avail);
                 pessoa.setImagem(bytesFromFile);
             } catch (IOException ex) {
